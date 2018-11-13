@@ -144,149 +144,149 @@ if ($md5_scss != $md5_data) {
                 </div>
             </div>
         </div>
-        <!-- Début Dialog Search -->
-        <div class="modal fade" id="searchModalCenter" tabindex="-1" role="dialog" aria-labelledby="searchModalCenter"
-            aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="searchModalTitle"></h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="open_modal_search" id="searchDivContent"></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary btn-age-ok" data-dismiss="modal">Fermer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="modal fade" id="searchModalView" tabindex="-1" role="dialog" aria-labelledby="showModalViewTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered modal-body-show modal-800" role="document">
-                <div class="modal-content" style="width:1250px;">
-                    <div class="modal-header">
-                        <h5 class="modal-view-title" id="showModalViewTitle"></h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-6 d-flex justify-content-center modal-view-img-c">
-                                    <img class="modal-view-img img-fluid" src="" alt="" />
-                                </div>
-                                <div class="col-6">
-                                    <p class="modal-view-syno"></p>
-                                    <p class="modal-view-date"></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary btn-age-ok" data-dismiss="modal">Fermer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Fin Dialog Search -->
-        <!-- Début Dialog Login -->
-        <div class="modal fade" id="loginModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Login</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-lg-12">Login avec
-                                <div class="social-buttons text-center">
-                                    <a href="#" class="btn btn-fb-dial"><i class="fa fa-facebook"></i> Facebook</a>
-                                    <a href="#" class="btn btn-tw-dial"><i class="fa fa-twitter"></i> Twitter</a>
-                                </div>Ou
-                                <form class="form" role="form" method="post" action="login" accept-charset="UTF-8" id="login-nav">
-                                    <div class="form-group">
-                                        <label class="sr-only" for="exampleInputEmail2">Email</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="sr-only" for="inputPassword2">Mot de passe</label>
-                                        <input type="password" class="form-control" id="inputPassword2" placeholder="Mot de passe" required>
-                                        <div class="form-text text-right"><a href="">Mot de passe perdu ?</a></div>
-                                    </div>
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary btn-block bg-red">Connection</button>
-                                        <div class="form-check">
-                                            <label><input type="checkbox">&nbsp;laisse moi connecté</label>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-secondary btn-block btn-register " data-dismiss="modal">Créer un compte</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Fin Dialog Login -->
-        <!-- Début Dialog Enregistrement -->
-        <div class="modal fade" id="registerModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Entregistrement</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-lg-12">Entregistrement avec
-                                <div class="social-buttons text-center">
-                                    <a href="#" class="btn btn-fb-dial"><i class="fa fa-facebook"></i> Facebook</a>
-                                    <a href="#" class="btn btn-tw-dial"><i class="fa fa-twitter"></i> Twitter</a>
-                                </div>Ou
-                                <form class="form" role="form" method="post" action="login" accept-charset="UTF-8" id="register-nav">
-                                    <div class="form-group">
-                                        <label class="sr-only" for="registerInputName">Nom</label>
-                                        <input type="input" class="form-control" id="registerInputName" placeholder="Nom" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="sr-only" for="registerInputEmail">E-Mail</label>
-                                        <input type="input" class="form-control" id="registerInputEmail" placeholder="E-Mail" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="sr-only" for="registerInputPassword">Mot de passe</label>
-                                        <input type="password" class="form-control" id="registerInputPassword" placeholder="Mot de passe" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="sr-only" for="registerInputPassword2">Confirmer le mot de passe</label>
-                                        <input type="password" class="form-control" id="registerInputPassword2" placeholder="Mot de passe" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn-primary btn-block bg-red" data-dismiss="modal">Enregistrement</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary btn-block btn-login" data-dismiss="modal">Login</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- Fin Dialog Enregistrement -->
     </header>
+    <!-- Début Dialog Search -->
+    <div class="modal fade" id="searchModalCenter" tabindex="-1" role="dialog" aria-labelledby="searchModalCenter"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="searchModalTitle"></h5>
+                </div>
+                <div class="modal-body">
+                    <div class="open_modal_search" id="searchDivContent"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-age-ok" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="searchModalView" tabindex="-1" role="dialog" aria-labelledby="showModalViewTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-body-show modal-800" role="document">
+            <div class="modal-content" style="width:1250px;">
+                <div class="modal-header">
+                    <h5 class="modal-view-title" id="showModalViewTitle"></h5>
+                </div>
+                <div class="modal-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-6 d-flex justify-content-center modal-view-img-c">
+                                <img class="modal-view-img img-fluid" src="" alt="" />
+                            </div>
+                            <div class="col-6">
+                                <p class="modal-view-syno"></p>
+                                <p class="modal-view-date"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-age-ok" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Dialog Search -->
+    <!-- Début Dialog Login -->
+    <div class="modal fade" id="loginModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Login</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">Login avec
+                            <div class="social-buttons text-center">
+                                <a href="#" class="btn btn-fb-dial"><i class="fa fa-facebook"></i> Facebook</a>
+                                <a href="#" class="btn btn-tw-dial"><i class="fa fa-twitter"></i> Twitter</a>
+                            </div>Ou
+                            <form class="form" role="form" method="post" action="login" accept-charset="UTF-8" id="login-nav">
+                                <div class="form-group">
+                                    <label class="sr-only" for="exampleInputEmail2">Email</label>
+                                    <input type="email" class="form-control" id="exampleInputEmail2" placeholder="Email" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="inputPassword2">Mot de passe</label>
+                                    <input type="password" class="form-control" id="inputPassword2" placeholder="Mot de passe" required>
+                                    <div class="form-text text-right"><a href="">Mot de passe perdu ?</a></div>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-block bg-red">Connection</button>
+                                    <div class="form-check">
+                                        <label><input type="checkbox">&nbsp;laisse moi connecté</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-secondary btn-block btn-register " data-dismiss="modal">Créer un compte</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Dialog Login -->
+    <!-- Début Dialog Enregistrement -->
+    <div class="modal fade" id="registerModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Entregistrement</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-lg-12">Entregistrement avec
+                            <div class="social-buttons text-center">
+                                <a href="#" class="btn btn-fb-dial"><i class="fa fa-facebook"></i> Facebook</a>
+                                <a href="#" class="btn btn-tw-dial"><i class="fa fa-twitter"></i> Twitter</a>
+                            </div>Ou
+                            <form class="form" role="form" method="post" action="login" accept-charset="UTF-8" id="register-nav">
+                                <div class="form-group">
+                                    <label class="sr-only" for="registerInputName">Nom</label>
+                                    <input type="input" class="form-control" id="registerInputName" placeholder="Nom" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="registerInputEmail">E-Mail</label>
+                                    <input type="input" class="form-control" id="registerInputEmail" placeholder="E-Mail" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="registerInputPassword">Mot de passe</label>
+                                    <input type="password" class="form-control" id="registerInputPassword" placeholder="Mot de passe" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="sr-only" for="registerInputPassword2">Confirmer le mot de passe</label>
+                                    <input type="password" class="form-control" id="registerInputPassword2" placeholder="Mot de passe" required>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-block bg-red" data-dismiss="modal">Enregistrement</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-block btn-login" data-dismiss="modal">Login</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Fin Dialog Enregistrement -->
     <!-- Social link -->
     <div class="content social-link-content">
         <div class="row">
             <ul class="social-btns">
-                <li><button class="btn btn-twitter btn-round font-weight-bold">Twitter<i class="fa fa-twitter fa-white pull-right" aria-hidden="true"></i></button></li>
-                <li><button class="btn btn-facebook btn-round font-weight-bold">Facebook<i class="fa fa-facebook fa-white pull-right" aria-hidden="true"></i></button></li>
-                <li><button class="btn btn-google btn-round font-weight-bold">Dribbble<i class="fab fa-dribbble fa-white pull-right" aria-hidden="true"></i></button></li>
-                <li><button class="btn btn-google btn-round font-weight-bold">Google<i class="fa fa-google-plus fa-white pull-right" aria-hidden="true"></i></button></li>
+                <li><button class="btn btn-twitter btn-round font-weight-bold">Twitter<span class="pull-right fa-round"><i class="fa fa-twitter fa-black pull-right twitter-left" aria-hidden="true"></span></i></button></li>
+                <li><button class="btn btn-facebook btn-round font-weight-bold">Facebook<span class="pull-right fa-round"><i class="fa fa-facebook fa-black pull-right facebook-left" aria-hidden="true"></span></i></button></li>
+                <li><button class="btn btn-google btn-round font-weight-bold">Dribbble<span class="pull-right fa-round"><i class="fab fa-dribbble fa-black pull-right drebbble-left" aria-hidden="true"></span></i></button></li>
+                <li><button class="btn btn-google btn-round font-weight-bold">Google<span class="pull-right fa-round"><i class="fa fa-google-plus fa-black pull-right google-left" aria-hidden="true"></span></i></button></li>
             </ul>
         </div>
     </div>
