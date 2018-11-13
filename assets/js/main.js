@@ -1,6 +1,7 @@
 /*
 * Création et affichage du RGPD
 */
+
 function rgpd() {
     var elem = document.createElement('script');
     elem.src = 'https://quantcast.mgr.consensu.org/cmp.js';
@@ -8,71 +9,75 @@ function rgpd() {
     elem.type = "text/javascript";
     var scpt = document.getElementsByTagName('script')[0];
     scpt.parentNode.insertBefore(elem, scpt);
-    (function() {
-    var gdprAppliesGlobally = true;
-    function addFrame() {
-        if (!window.frames['__cmpLocator']) {
-        if (document.body) {
-            var body = document.body,
-                iframe = document.createElement('iframe');
-            iframe.style = 'display:none';
-            iframe.name = '__cmpLocator';
-            body.appendChild(iframe);
-        } else {
-            // In the case where this stub is located in the head,
-            // this allows us to inject the iframe more quickly than
-            // relying on DOMContentLoaded or other events.
-            setTimeout(addFrame, 5);
+    (function () {
+        var gdprAppliesGlobally = true;
+        function addFrame() {
+            if (!window.frames['__cmpLocator']) {
+                if (document.body) {
+                    var body = document.body,
+                        iframe = document.createElement('iframe');
+                    iframe.style = 'display:none';
+                    iframe.name = '__cmpLocator';
+                    body.appendChild(iframe);
+                } else {
+                    // In the case where this stub is located in the head,
+                    // this allows us to inject the iframe more quickly than
+                    // relying on DOMContentLoaded or other events.
+                    setTimeout(addFrame, 5);
+                }
+            }
         }
+        addFrame();
+        function cmpMsgHandler(event) {
+            var msgIsString = typeof event.data === "string";
+            var json;
+            if (msgIsString) {
+                json = event.data.indexOf("__cmpCall") != -1 ? JSON.parse(event.data) : {};
+            } else {
+                json = event.data;
+            }
+            if (json.__cmpCall) {
+                var i = json.__cmpCall;
+                window.__cmp(i.command, i.parameter, function (retValue, success) {
+                    var returnMsg = {
+                        "__cmpReturn": {
+                            "returnValue": retValue,
+                            "success": success,
+                            "callId": i.callId
+                        }
+                    };
+                    event.source.postMessage(msgIsString ?
+                        JSON.stringify(returnMsg) : returnMsg, '*');
+                });
+            }
         }
-    }
-    addFrame();
-    function cmpMsgHandler(event) {
-        var msgIsString = typeof event.data === "string";
-        var json;
-        if(msgIsString) {
-        json = event.data.indexOf("__cmpCall") != -1 ? JSON.parse(event.data) : {};
-        } else {
-        json = event.data;
+        window.__cmp = function (c) {
+            var b = arguments;
+            if (!b.length) {
+                return __cmp.a;
+            }
+            else if (b[0] === 'ping') {
+                b[2]({
+                    "gdprAppliesGlobally": gdprAppliesGlobally,
+                    "cmpLoaded": false
+                }, true);
+            } else if (c == '__cmp')
+                return false;
+            else {
+                if (typeof __cmp.a === 'undefined') {
+                    __cmp.a = [];
+                }
+                __cmp.a.push([].slice.apply(b));
+            }
         }
-        if (json.__cmpCall) {
-        var i = json.__cmpCall;
-        window.__cmp(i.command, i.parameter, function(retValue, success) {
-            var returnMsg = {"__cmpReturn": {
-            "returnValue": retValue,
-            "success": success,
-            "callId": i.callId
-            }};
-            event.source.postMessage(msgIsString ?
-            JSON.stringify(returnMsg) : returnMsg, '*');
-        });
+        window.__cmp.gdprAppliesGlobally = gdprAppliesGlobally;
+        window.__cmp.msgHandler = cmpMsgHandler;
+        if (window.addEventListener) {
+            window.addEventListener('message', cmpMsgHandler, false);
         }
-    }
-    window.__cmp = function (c) {
-        var b = arguments;
-        if (!b.length) {
-        return __cmp.a;
-        }
-        else if (b[0] === 'ping') {
-        b[2]({"gdprAppliesGlobally": gdprAppliesGlobally,
-            "cmpLoaded": false}, true);
-        } else if (c == '__cmp')
-        return false;
         else {
-        if (typeof __cmp.a === 'undefined') {
-            __cmp.a = [];
+            window.attachEvent('onmessage', cmpMsgHandler);
         }
-        __cmp.a.push([].slice.apply(b));
-        }
-    }
-    window.__cmp.gdprAppliesGlobally = gdprAppliesGlobally;
-    window.__cmp.msgHandler = cmpMsgHandler;
-    if (window.addEventListener) {
-        window.addEventListener('message', cmpMsgHandler, false);
-    }
-    else {
-        window.attachEvent('onmessage', cmpMsgHandler);
-    }
     })();
     window.__cmp('init', {
         'Language': 'fr',
@@ -105,28 +110,1068 @@ function rgpd() {
 /*
 * Traitement du bouton majeur
 */
-$( function() {
-    $( "#dialog-majeur" ).dialog({
-    resizable: false,
-    height: "auto",
-    draggable: false,
-    width: "400",
-    modal: true,
-    closeOnEscape: false,
-    open: function(event, ui) {
-        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-        $("body").css("overflow", "hidden")
-    },
-    buttons: {
-        "Je suis majeur": function() {
-            $( this ).dialog( "close" );
-            $("body").css("overflow", "auto")
-            rgpd()
-        },
-        "Je suis mineur": function() {
-            $( this ).dialog( "close" );
-        window.location.replace("http://stackoverflow.com");
+$(window).on('load', function () {
+    /*$('#exampleModalCenter').modal({
+        backdrop: 'static'
+    })*/
+})
+
+$('.btn-login').click(function () {
+    $('#loginModalCenter').modal({
+    })
+})
+
+$('.btn-register').click(function () {
+    $('#registerModalCenter').modal({
+    })
+})
+
+$('.btn-age-ok').click(function () {
+    rgpd()
+})
+
+$('.btn-age-cancel').click(function () {
+    window.location.replace("http://imdb.com")
+})
+
+let state = true
+
+$('.navbar-toggler').click(function () {
+    if (state == true) {
+        $('.navbar').addClass('solid')
+        state = false
+    } else if (state == false) {
+        $('.navbar').removeClass('solid')
+        state = true
+    }
+})
+
+/*
+* Gestion des ancres pour avoir un positionnement correct et activer les catégories
+*/
+function ancreAuto(ancre) {
+    if (ancre == 'home')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $(".jumbotron").offset().top-90
+        }, 2000)
+    }
+    else if (ancre == 'fAll')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredMovie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-movie"]').addClass('active')
+        $('[aria-controls="pills-action-movie"]').removeClass('active')
+        $('[aria-controls="pills-policier-movie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-movie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-movie"]').removeClass('active')
+        drawChoice('.*', 'film')
+    }
+    else if (ancre == 'fAction')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredMovie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-movie"]').removeClass('active')
+        $('[aria-controls="pills-action-movie"]').addClass('active')
+        $('[aria-controls="pills-policier-movie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-movie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-movie"]').removeClass('active')
+        drawChoice('action', 'film')
+    }
+    else if (ancre == 'fPolicier')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredMovie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-movie"]').removeClass('active')
+        $('[aria-controls="pills-action-movie"]').removeClass('active')
+        $('[aria-controls="pills-policier-movie"]').addClass('active')
+        $('[aria-controls="pills-comedie-movie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-movie"]').removeClass('active')
+        drawChoice('policier', 'film')
+    }
+    else if (ancre == 'fComedie')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredMovie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-movie"]').removeClass('active')
+        $('[aria-controls="pills-action-movie"]').removeClass('active')
+        $('[aria-controls="pills-policier-movie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-movie"]').addClass('active')
+        $('[aria-controls="pills-horreur-movie"]').removeClass('active')
+        drawChoice('comedie', 'film')
+    }
+    else if (ancre == 'fHorreur')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredMovie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-movie"]').removeClass('active')
+        $('[aria-controls="pills-action-movie"]').removeClass('active')
+        $('[aria-controls="pills-policier-movie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-movie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-movie"]').addClass('active')
+        drawChoice('horreur', 'film')
+    }
+    if (ancre == 'sAll')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredSerie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-serie"]').addClass('active')
+        $('[aria-controls="pills-action-serie"]').removeClass('active')
+        $('[aria-controls="pills-policier-serie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-serie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-serie"]').removeClass('active')
+        drawChoice('.*', 'serie')
+    }
+    else if (ancre == 'sAction')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredSerie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-serie"]').removeClass('active')
+        $('[aria-controls="pills-action-serie"]').addClass('active')
+        $('[aria-controls="pills-policier-serie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-serie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-serie"]').removeClass('active')
+        drawChoice('action', 'serie')
+    }
+    else if (ancre == 'sPolicier')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredSerie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-serie"]').removeClass('active')
+        $('[aria-controls="pills-action-serie"]').removeClass('active')
+        $('[aria-controls="pills-policier-serie"]').addClass('active')
+        $('[aria-controls="pills-comedie-serie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-serie"]').removeClass('active')
+        drawChoice('policier', 'serie')
+    }
+    else if (ancre == 'sComedie')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredSerie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-serie"]').removeClass('active')
+        $('[aria-controls="pills-action-serie"]').removeClass('active')
+        $('[aria-controls="pills-policier-serie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-serie"]').addClass('active')
+        $('[aria-controls="pills-horreur-serie"]').removeClass('active')
+        drawChoice('comedie', 'serie')
+    }
+    else if (ancre == 'sHorreur')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#featuredSerie").offset().top-90
+        }, 2000)
+        $('[aria-controls="pills-all-serie"]').removeClass('active')
+        $('[aria-controls="pills-action-serie"]').removeClass('active')
+        $('[aria-controls="pills-policier-serie"]').removeClass('active')
+        $('[aria-controls="pills-comedie-serie"]').removeClass('active')
+        $('[aria-controls="pills-horreur-serie"]').addClass('active')
+        drawChoice('horreur', 'serie')
+    }
+    else if (ancre == 'shop')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#shopMovies").offset().top-110
+        }, 2000)
+    }
+    else if (ancre == 'contact')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#contactUs").offset().top-110
+        }, 2000)
+    }
+    else if (ancre == 'footer')
+    {
+        $([document.documentElement, document.body]).animate({
+            scrollTop: $("#footerNav").offset().top-110
+        }, 2000)
+    }
+}
+/*
+* Gestion film/séries
+*/
+let drawCard = (data, section) => { // Créer les cartes des films etc
+    let id = 0
+    let list = data
+    let board
+
+    let row = document.createElement('div')
+
+    if (section == 'film') {
+        board = document.getElementById('feturedFilmView')
+        row.className = "row list-film"
+    } else if (section == 'serie') {
+        board = document.getElementById('feturedSerieView')
+        row.className = "row list-serie"
+    } else if (section == 'top') {
+        board = document.getElementById('topFilmView')
+        row.className = "row list-top"
+    } else if (section == 'shop') {
+        board = document.getElementById('shopFilmView')
+        row.className = "row list-shop"
+    }
+
+    board.appendChild(row)
+
+    for (let i = 0; i < list.length; i++) {
+
+        let col = document.createElement('div')
+        if (section == 'top' && i == 0)
+            col.className = 'card_featured col-2 offset-md-1'
+        else if (section == 'shop')
+            col.className = 'card_featured col-3'
+        else
+            col.className = 'card_featured col-2'
+
+        col.setAttribute('id', 'show-' + list[id][0])
+
+        let img = document.createElement('img')
+        img.setAttribute('class', 'img-fluid')
+        img.setAttribute('id', 'show-' + list[id][0])
+        img.src = list[id][5]
+        img.alt = list[id][1]
+
+        let divFoot = document.createElement('div')
+        if (section == 'shop')
+            divFoot.setAttribute('class', 'modal-movie-title')
+
+        let pTitle = document.createElement('p')
+        pTitle.setAttribute('class', 'p_top_title text-center')
+        pTitle.setAttribute('id', 'show-' + list[id][0])
+        pTitle.innerText = list[id][1]
+
+        let divFootDG = document.createElement('div')
+        divFootDG.setAttribute('class', 'd-flex justify-content-around')
+        divFootDG.setAttribute('id', 'show-' + list[id][0])
+
+        let pDate = document.createElement('p')
+        pDate.setAttribute('class', 'p_top p_top_date')
+        pDate.setAttribute('id', 'show-' + list[id][0])
+        pDate.innerText = list[id][2].substr(0, 4)
+
+        let pGenre = document.createElement('p')
+        pGenre.setAttribute('id', 'show-' + list[id][0])
+
+        if (section == 'shop') {
+            pGenre.setAttribute('class', 'p_top p_top_genre text-red font-weight-bold')
+            pGenre.innerText = list[id][9] + ' €'
+        } else {
+            pGenre.setAttribute('class', 'p_top p_top_genre font-weight-bold')
+            pGenre.innerText = list[id][4]
+        }
+        col.appendChild(img)
+        divFoot.appendChild(pTitle)
+        divFoot.appendChild(divFootDG)
+        divFootDG.appendChild(pDate)
+        divFootDG.appendChild(pGenre)
+        col.appendChild(divFoot)
+        row.appendChild(col)
+        id++
+    }
+}
+
+Element.prototype.remove = function () {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function () {
+    for (let i = this.length - 1; i >= 0; i--) {
+        if (this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
         }
     }
-    });
-} );
+}
+
+function listDomClear(section) { // Efface les cartes
+    if (section == 'film') {
+        document.getElementsByClassName('list-film').remove()
+    } else if (section == 'serie') {
+        document.getElementsByClassName('list-serie').remove()
+    } else if (section == 'search') {
+        document.getElementsByClassName('list-search').remove()
+    }
+}
+/*
+* Gestion de la recherche
+*/
+
+var recherche
+
+function searchAPI(search) {
+    let xhrSearch = new XMLHttpRequest;
+    xhrSearch.open('GET', 'https://api.themoviedb.org/3/search/multi?api_key=31acc0aa28918e9b4fc08a305e1b3b45&language=fr-FR&query='+search+'&page=1&include_adult=false&region=FR', false)
+    xhrSearch.onload = function () {
+        if (this.status === 200) {
+            recherche = {}
+            recherche = JSON.parse(this.responseText)
+
+            $('#searchModalTitle').text('Recherche : '+search)
+
+            board = document.getElementById('searchDivContent')
+            let row = document.createElement('div')
+            row.className = "row list-search"
+            board.appendChild(row)
+
+            for (let i = 0; i < 4; i++) {
+                let ret = recherche.results[i]
+                let col = document.createElement('div')
+                col.className = 'card_featured col-3'
+                col.setAttribute('id', 'show-' + i)
+
+                let img = document.createElement('img')
+                img.setAttribute('class', 'img-fluid')
+                img.setAttribute('id', 'show-' + i)
+                img.src = 'https://image.tmdb.org/t/p/w500/'+ret.poster_path
+                img.alt = ret.title
+
+                let pTitle = document.createElement('p')
+                pTitle.setAttribute('class', 'p_top_title text-center')
+                pTitle.setAttribute('id', 'show-' + i)
+                if (!ret.title)
+                    pTitle.innerText = ret.name
+                else
+                    pTitle.innerText = ret.title
+
+                let divFoot = document.createElement('div')
+
+                let divFootDG = document.createElement('div')
+                divFootDG.setAttribute('class', 'd-flex justify-content-around')
+                divFootDG.setAttribute('id', 'show-' + i)
+
+                let pDate = document.createElement('p')
+                pDate.setAttribute('class', 'p_top p_top_date')
+                pDate.setAttribute('id', 'show-' + i)
+                if (!ret.release_date)
+                    pDate.innerText = ret.first_air_date
+                else
+                    pDate.innerText = ret.release_date
+
+                
+                col.appendChild(img)
+                divFoot.appendChild(pTitle)
+                divFoot.appendChild(divFootDG)
+                divFootDG.appendChild(pDate)
+                col.appendChild(divFoot)
+                row.appendChild(col)
+            }
+        }
+    }
+    xhrSearch.send()
+
+    $('.open_modal_search').click(function () {
+        $('#searchModalView').modal({
+            //backdrop: 'static'
+        });
+
+        let vId = event.target.id.replace('show-', '')
+
+        if (new RegExp(/show-[0-9]?/).test(event.target.id)) {
+            if (!recherche.results[vId].title)
+                $('.modal-view-title').text(recherche.results[vId].name)
+            else
+                $('.modal-view-title').text(recherche.results[vId].title)
+            $('.modal-view-img').attr('src', 'https://image.tmdb.org/t/p/w500/'+recherche.results[vId].poster_path) // 5 Picture 10 YT
+            $('.modal-view-img').attr('alt', recherche.results[vId].title)
+            $('.modal-view-syno').text(recherche.results[vId].overview)
+            if (!recherche.results[vId].release_date)
+                $('.modal-view-date').text('Date : ' + recherche.results[vId].first_air_date)
+            else
+                $('.modal-view-date').text('Date : ' + recherche.results[vId].release_date)
+        }
+    })
+}
+
+$('.search-query').keypress(function() {
+    if (event.which == 13) {
+        
+        let search = $('.search-query').val()
+        listDomClear('search')
+        searchAPI(search)
+
+        $('#searchModalCenter').modal({
+            //backdrop: 'static'
+        })
+        return false // Coupe le reload de la page
+    }
+})
+
+/*
+* Generation de la liste via une API
+*/
+
+let listeGlobal = []
+
+function generateListe(section) {
+    let countAction = 0
+    let countComedie = 0
+    let countPolicier = 0
+    let countHorreur = 0
+
+    let page = 1
+
+    while (countAction < 36 || countComedie < 36 || countPolicier < 36 || countHorreur < 36) {
+        let xhr = new XMLHttpRequest
+        if (section == 'film')
+            xhr.open('GET', 'https://api.themoviedb.org/3/movie/top_rated?api_key=31acc0aa28918e9b4fc08a305e1b3b45&language=fr-FR&page=' + page, false)
+        else if (section == 'serie')
+            xhr.open('GET', 'https://api.themoviedb.org/3/tv/top_rated?api_key=31acc0aa28918e9b4fc08a305e1b3b45&language=fr-FR&page=' + page, false)
+        xhr.onload = function () {
+            if (this.status === 200) {
+
+                let test = JSON.parse(this.responseText)
+                nbpages = test.total_pages
+
+                test.results.forEach(function (res) {
+
+                    if (section == 'film' && (res.genre_ids.includes(27) || res.genre_ids.includes(28) || res.genre_ids.includes(35) || res.genre_ids.includes(80))) {
+                        let tmp = ''
+                        if (res.genre_ids.includes(878)) {
+                            countHorreur = countHorreur + 5
+                            tmp += ' horreur'
+                        }
+
+                        if (res.genre_ids.includes(28)) {
+                            countAction++
+                            tmp += ' action'
+                        }
+
+                        if (res.genre_ids.includes(35)) {
+                            countComedie++
+                            tmp += ' comedie'
+                        }
+
+                        if (res.genre_ids.includes(80)) {
+                            countPolicier++
+                            tmp += ' policier'
+                        }
+                        //console.log('listeGlobal.push([listeGlobal.length, "'+res.title+'", "'+res.release_date+'", "'+section+'", "'+tmp+'", "https://image.tmdb.org/t/p/w500'+res.poster_path+'", "'+res.overview+'", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])')
+                        listeGlobal.push([listeGlobal.length, res.title, res.release_date, section, tmp, 'https://image.tmdb.org/t/p/w500' + res.poster_path, res.overview, 'TheDoudou', 'JC & Hadrien', 0, 'PJQVlVHsFF8'])
+
+                    } else if (section == 'serie' && (res.genre_ids.includes(35) || res.genre_ids.includes(80) || res.genre_ids.includes(10759) || res.genre_ids.includes(10765))) {
+                        let tmp = ''
+                        if (res.genre_ids.includes(10765)) {
+                            countHorreur = countHorreur + 5
+                            tmp += ' horreur'
+                        }
+
+                        if (res.genre_ids.includes(10759)) {
+                            countAction++
+                            tmp += ' action'
+                        }
+
+                        if (res.genre_ids.includes(35)) {
+                            countComedie++
+                            tmp += ' comedie'
+                        }
+
+                        if (res.genre_ids.includes(80)) {
+                            countPolicier++
+                            tmp += ' policier'
+                        }
+
+                        //console.log('listeGlobal.push([listeGlobal.length, "'+res.name+'", "'+res.first_air_date+'", "'+section+'", "'+tmp+'", "https://image.tmdb.org/t/p/w500'+res.poster_path+'", "'+res.overview+'", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])')
+                        listeGlobal.push([listeGlobal.length, res.name, res.first_air_date, section, tmp, 'https://image.tmdb.org/t/p/w500' + res.poster_path, res.overview, 'TheDoudou', 'JC & Hadrien', 0, 'PJQVlVHsFF8'])
+                    }
+                })
+            }
+        }
+        xhr.send()
+        page++
+    }
+}
+
+//generateListe('film')     // Traitement des films et série via l'api mais trop long (5 secondes) dans une V2 gestion du cache coté serveur
+//generateListe('serie')    // Du coup j'ai mis une liste en dur 
+
+///*
+listeGlobal.push([listeGlobal.length, "Dilwale Dulhania Le Jayenge", "1995-10-20", "film", " comedie", "https://image.tmdb.org/t/p/w500/uC6TTUhPpQCmgldGyYveKRAu8JN.jpg", "Chaudhry Baldev Singh est un père de famille installé à Londres. Un jour, il reçoit une lettre d'Inde : son meilleur ami lui écrit, lui rappellant la promesse qu'il avait faite deux décennies auparavant de marier leurs enfants. Chaudhry décide alors de tenir sa promesse, mais donne toutefois un mois libre à sa fille tout avant qu'elle ne s'en aille en Inde se marier...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Évadés", "1994-09-23", "film", " policier", "https://image.tmdb.org/t/p/w500/5cIUvCJQ2aNPXRCmXiOIuJJxIki.jpg", "En 1947, Andy Dufresne, un jeune banquier, est condamné à la prison à vie pour le meurtre de sa femme et de son amant. Ayant beau clamer son innocence, il est emprisonné à Shawshank, le pénitencier le plus sévère de l'Etat du Maine. Il y fait la rencontre de Red, un Noir désabusé, détenu depuis vingt ans. Commence alors une grande histoire d'amitié entre les deux hommes...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Parrain", "1972-03-14", "film", " policier", "https://image.tmdb.org/t/p/w500/j0O2PYvV2INW64jmTc4e5IVqQsz.jpg", "En 1945, à New York, les Corleone sont une des cinq familles de la mafia. Don Vito Corleone, parrain de cette famille, marie sa fille à un bookmaker. Sollozzo, parrain de la famille Tattaglia, propose à Don Vito une association dans le trafic de drogue, mais celui-ci refuse. Sonny, un de ses fils, y est quant à lui favorable. Afin de traiter avec Sonny, Sollozzo tente de faire tuer Don Vito, mais celui-ci en réchappe. Michael, le frère cadet de Sonny, recherche alors les commanditaires de l'attentat et tue Sollozzo et le chef de la police, en représailles. Michael part alors en Sicile, où il épouse Apollonia, mais celle-ci est assassinée à sa place. De retour à New York, Michael épouse Kay Adams et se prépare à devenir le successeur de son père...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Parrain, 2ème partie", "1974-12-20", "film", " policier", "https://image.tmdb.org/t/p/w500/mbdznNojYg8a0CjGsfqXerpRKzm.jpg", "Depuis la mort de Don Vito Corleone, son fils Michael règne sur la famille. Amené à  négocier avec la mafia juive, il perd alors le soutien d'un de ses lieutenants, Frankie Pentageli. Échappant de justesse à un attentat, Michael tente de retrouver le coupable.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Vie est belle", "1997-12-20", "film", " comedie", "https://image.tmdb.org/t/p/w500/c6NveyskoKlwAvouqEmKBRU0Pkp.jpg", "En 1938, Guido, jeune homme plein de gaieté, rêve d'ouvrir une librairie, malgré les tracasseries de l'administration fasciste. Il tombe amoureux de Dora, institutrice étouffée par le conformisme familial et l'enlève le jour de ses fiançailles avec un bureaucrate du régime. Cinq ans plus tard, Guido et Dora ont un fils: Giosue. Mais les lois raciales sont entrées en vigueur et Guido est juif. Il est alors déporté avec son fils. Par amour pour eux, Dora monte de son plein gré dans le train qui les emmène aux camps de la mort où Guido va tout faire pour éviter l'horreur à son fils...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Ligne verte", "1999-12-10", "film", " policier", "https://image.tmdb.org/t/p/w500/lNNe9VghX4RmFB3r11dlREXKW7.jpg", "Paul Edgecomb, pensionnaire centenaire d'une maison de retraite, est hanté par ses souvenirs. Gardien-chef du pénitencier de Cold Mountain en 1935, il était chargé de veiller au bon déroulement des exécutions capitales en s'efforcant d'adoucir les derniers moments des condamnés. Parmi eux se trouvait un colosse du nom de John Coffey, accusé du viol et du meurtre de deux fillettes. Intrigué par cet homme candide et timide aux dons magiques, Edgecomb va tisser avec lui des liens très forts.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Pulp Fiction", "1994-09-10", "film", " policier", "https://image.tmdb.org/t/p/w500/7p8x4U3o3p1JZMBqNY3zAlobY3m.jpg", "L'odyssée sanglante et burlesque de petits malfrats dans la jungle d'Hollywood : deux petits tueurs, un dangereux gangster marié à une camée, un boxeur roublard, des prêteurs sur gages sadiques, un caïd élégant et dévoué, un dealer bon mari et de deux tourtereaux à la gâchette facile.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Dark Knight : Le Chevalier noir", "2008-07-16", "film", " action policier", "https://image.tmdb.org/t/p/w500/sr8tdzgBj29H8rItNP9e5h097A2.jpg", "Dans ce nouveau volet, Batman augmente les mises dans sa guerre contre le crime. Avec l'appui du lieutenant de police Jim Gordon et du procureur de Gotham, Harvey Dent, Batman vise à éradiquer le crime organisé qui pullule dans la ville. Leur association est très efficace mais elle sera bientôt bouleversée par le chaos déclenché par un criminel extraordinaire que les citoyens de Gotham connaissent sous le nom de Joker.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Psychose", "1960-06-16", "film", "", "https://image.tmdb.org/t/p/w500/z82TaRvjLTVFLvv7hsPMAUmXR9R.jpg", "Marion Crane en a assez de ne pouvoir mener sa vie comme elle l'entend. Son travail ne la passionne plus, son amant ne peut l'épouser car il doit verser une énorme pension alimentaire le laissant sans le sou... Mais un beau jour, son patron lui demande de déposer 40 000 dollars à la banque. La tentation est trop grande, et Marion s'enfuit avec l'argent.Très vite la panique commence à se faire sentir. Partagée entre l'angoisse de se faire prendre et l'excitation de mener une nouvelle vie, Marion roule vers une destination qu'elle n'atteindra jamais. La pluie est battante, la jeune femme s'arrête près d'un motel, tenu par un sympathique gérant nommé Norman Bates, mais qui doit supporter le caractère possessif de sa mère.Après un copieux repas avec Norman, Marion prend toutes ses précautions afin de dissimuler l'argent. Pour se délasser de cette journée, elle prend une douche...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Il était une fois en Amérique", "1984-05-23", "film", " policier", "https://image.tmdb.org/t/p/w500/lceDkyApiBIZl1YhzpxX7T5Fm7t.jpg", "Il était une fois deux truands juifs, Max et Noodles, liés par un pacte d'éternelle amitié. Débutant au début du siècle par de fructueux trafics dans le ghetto de New York, ils voient leurs chemins se séparer, lorsque Noodles se retrouve durant quelques années derrière les barreaux, puis se recouper en pleine période de prohibition, dans les années vingt. Jusqu'au jour où la trahison les sépare à nouveau.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Will A Dog", "2000-09-15", "film", " comedie", "https://image.tmdb.org/t/p/w500/uHEmM49YphluJnGep8Ef1qwD2QX.jpg", "Le quartier animé João Grilo et chico sournoise sont pauvres gars qui vivent dans l'arrière-pays qui trichent un tas de gens dans une petite ville du Nord-Est du Brésil. Mais quand ils meurent, ils doivent être jugés par le Christ, le diable et la Vierge Marie, avant d'être admis au paradis.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Forrest Gump", "1994-07-06", "film", " comedie", "https://image.tmdb.org/t/p/w500/4D8CoCW07df1Ryb2qFyY7lxBRGK.jpg", "Forrest Gump est le symbole d'une époque, un candide dans une Amérique qui a perdu son innocence. Merveilleusement interprété par Tom Hanks, Forrest vit une série d'aventures, de l'état d'handicapé physique à celui de star du football, de héros du Vietnam au roi de la crevette, des honneurs de la Maison Blanche au bonheur d'une grande histoire d'amour. Son cœur dépasse les limites de son Q.I.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Affranchis", "1990-09-12", "film", " policier", "https://image.tmdb.org/t/p/w500/uNhz24wyHxTpeJTU0UvCiEex3OI.jpg", "Brooklyn, dans les années 50. Depuis l'enfance, le jeune Henry Hill rêve de devenir gangster. A 16 ans, il se met en selle auprès de Paul Cicero, un caïd local, et commet ses premiers délits. Arrêté et interrogé, il refuse de parler et gagne ainsi le respect du milieu. A sa sortie de prison, il fait la connaissance de James Conway et de Tommy DeVito, deux truands d'une extrême violence, et se lance avec eux dans des trafics de grande envergure. Karen, une jeune bourgeoise qu'il courtise et finit par épouser, ne devine sa profession qu'après être passée devant l'officier d'état-civil. Grisé par le succès, Henry multiplie les coups les plus audacieux...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les sept samouraïs", "1954-04-26", "film", " action", "https://image.tmdb.org/t/p/w500/itaaGjeYL5ZzufV8BOxkTYQxx4K.jpg", "Au XVIè siècle, au Japon, des paysans décident d'embaucher des samouraïs pour protéger leur village, et en trouvent sept. Ces hommes organisent la défense du village contre quarante brigands.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Seigneur des anneaux : Le Retour du roi", "2003-12-01", "film", " action", "https://image.tmdb.org/t/p/w500/nZVMVULm6nFZQ7QTHnWoH0Wp2ck.jpg", "Les armées de Sauron ont attaqué Minas Tirith, la capitale de Gondor.  Jamais ce royaume autrefois puissant n'a eu autant besoin de son roi.  Mais Aragorn trouvera-t-il en lui la volonté d'accomplir sa destinée ?  Tandis que Gandalf s'efforce de soutenir les forces brisées de Gondor, Théoden exhorte les guerriers de Rohan à se joindre au combat.  Mais malgré leur courage et leur loyauté, les forces des Hommes ne sont pas de taille à lutter contre les innombrables légions d'ennemis qui s'abattent sur le royaume...  Chaque victoire se paye d'immenses sacrifices.  Malgré ses pertes, la Communauté se jette dans la bataille pour la vie, ses membres faisant tout pour détourner l'attention de Sauron afin de donner à Frodon une chance d'accomplir sa quête.  Voyageant à travers les terres ennemies, ce dernier doit se reposer sur Sam et Gollum, tandis que l'Anneau continue de le tenter...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Lumières de la ville", "1931-02-26", "film", " comedie", "https://image.tmdb.org/t/p/w500/ayOkrSvNXDl6tWXUYt9qu6AhNuF.jpg", "Charlot vagabond vient en aide à une jeune fleuriste aveugle et se fait passer pour un homme riche. A force de travail il réunit assez d'argent pour que la jeune fille recouvre la vue.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Dictateur", "1940-10-15", "film", " comedie", "https://image.tmdb.org/t/p/w500/5N46j33uQKVmEDrdNyKMWHiJAMd.jpg", "Dans le ghetto juif vit un petit barbier qui ressemble énormément à Adenoid Hynkel, le dictateur de Tomania qui a décidé l'extermination du peuple juif. Au cours d'une rafle, le barbier est arrêté en compagnie de Schultz, un farouche adversaire d'Hynkel...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'Empire contre-attaque", "1980-05-20", "film", " horreur action", "https://image.tmdb.org/t/p/w500/nqY9dJeRaSEJlmljOpPA5Tc9moQ.jpg", "Malgré la destruction de l’Étoile Noire, l'Empire maintient son emprise sur la galaxie, et poursuit sans relâche sa lutte contre l'Alliance rebelle. Basés sur la planète glacée de Hoth, les rebelles essuient un assaut des troupes impériales. Parvenus à s'échapper, la princesse Leia, Han Solo, Chewbacca et C-3P0 se dirigent vers Bespin, la cité des nuages gouvernée par Lando Calrissian, ancien compagnon de Han. Suivant les instructions d'Obi-Wan Kenobi, Luke Skywalker se rend quant à lui vers le système de Dagobah, planète marécageuse où il doit recevoir l'enseignement du dernier maître Jedi, Yoda. Apprenant l'arrestation de ses compagnons par les stormtroopers de Dark Vador après la trahison de Lando, Luke décide d'interrompre son entraînement pour porter secours à ses amis et affronter le sombre seigneur Sith...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Enquête sur un citoyen au-dessus de tout soupçon", "1970-02-09", "film", " policier", "https://image.tmdb.org/t/p/w500/aHiFaZ6GdUHCWMGBhQPPjOThSkw.jpg", "En Italie, au début des années 70, le chef de la brigade criminelle est sur le point d’être promu au poste de directeur de la section politique. Persuadé que ses fonctions le placent au-dessus des lois, il égorge sa maîtresse, Augusta Terzi, au cours de leurs joutes amoureuses. Avec un sang-froid parfait, il met tout en œuvre pour prouver que personne n'aura l'intelligence, ni même l'audace, de le soupçonner et de troubler ainsi la bonne hiérarchie sociale. Il s'ingénie à semer des preuves accablantes, relançant l'enquête quand celle-ci s'égare...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Harakiri", "1962-09-15", "film", " action", "https://image.tmdb.org/t/p/w500/5j6VtBsMCOScw59mIgYhJYGQPgz.jpg", "Au XVIIe siècle, le Japon n'est plus en guerre et le pays est dirigé avec fermeté. Hanshirô Tsugumo, un rônin (samouraï errant) sans travail parmi tant d'autres, décide de frapper à la porte du puissant clan des Ii. Reçu par Kageyu Saitô, l'intendant du clan, il lui demande la permission d'accomplir le suicide par harakiri dans la résidence. Tentant de l'en dissuader, Saitô commence alors à lui raconter l'histoire de Motome Chijiwa, un ancien rônin qui souhaitait accomplir, lui aussi, le même rituel.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Cité de Dieu", "2002-02-05", "film", " policier", "https://image.tmdb.org/t/p/w500/gE3LDFgYWwqqM9pxTmk0lEaxQcg.jpg", "Dans une favela qui a vu le jour à Rio de Janeiro dans les années soixante, Fusée est un gamin noir, pauvre, trop fragile pour devenir hors-la-loi, mais assez malin pour ne pas se contenter d'un travail sous payé. Il grandit dans un environnement violent, mais tente de voir la réalité autrement, avec l'oeil d'un artiste. Il rêve de devenir photographe professionnel.Petit Dé, un enfant de onze ans, emménage dans la Cité. Il souhaite pour sa part devenir le plus grand criminel de Rio et commence son apprentissage en rendant de menus services à la pègre locale. Il admire Tignasse et son gang, qui arraisonnent les camions et cambriolent à tout va. Tignasse donne à Petit Dé l'occasion de commettre un meurtre, le premier d'une longue série...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mes chers amis", "1975-06-06", "film", " comedie", "https://image.tmdb.org/t/p/w500/p72D8AQMa87waHg7Je9ReSnxPBi.jpg", "Mes chers amis raconte l'histoire de cinq quadragénaires italiens qui ont cessé de grandir depuis qu'ils ont dix ans. Ils s'amusent avec leurs aventures de gamins - que ce soit des blagues ou autres - où tout est prétexte à rire.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "In a Heartbeat", "2017-06-01", "film", " comedie", "https://image.tmdb.org/t/p/w500/wJUJROdLOtOzMixkjkx1aaZGSLl.jpg", "Un sacré coup de foudre d'un garçon pour l'un de ses camarades en pleine école.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Entre le ciel et l'enfer", "1963-03-01", "film", " policier", "https://image.tmdb.org/t/p/w500/mZl5gam6VLL78cY8r4UUt75nZhl.jpg", "À Yokohama, un malfaiteur kidnappe un enfant, qu'il prend pour le fils d'un industriel japonais. Il s'agit en fait du fils de son chauffeur. Le commissaire Tokura est chargé de l'affaire.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Témoin à charge", "1957-12-17", "film", " policier", "https://image.tmdb.org/t/p/w500/nM0L28AL9NfK7Ru3cBFzrhZVzMW.jpg", "Sir Wilfrid, un brillant et expérimenté avocat spécialiste des causes perdues, sort d'un séjour prolongé à l'hôpital et doit, pour des raisons de santé, renoncer à s'occuper d'affaires criminelles trop stimulantes. C'est à ce moment que Leonard Vole, accusé du meurtre de Mme French, vient lui demander son aide. Bien que l'affaire paraisse passionnante, Sir Wilfrid refuse de s'en occuper pour préserver sa santé et conseille un autre avocat, Mr Brogan-Moore, un de ses anciens élèves. Après le départ de Leonard Vole du bureau de Sir Wilfrid, Christine Vole, la femme de Leonard, fait son apparition. Elle est son seul alibi pour le soir du meurtre. Son attitude très froide et son rôle crucial dans l'affaire font changer Sir Wilfrid d'avis, qui décide malgré les recommandations des médecins de s'occuper de cette affaire fascinante.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Léon", "1994-09-14", "film", " policier", "https://image.tmdb.org/t/p/w500/gbw7Tm7SUyiTMhI2B8yHk4OcT9I.jpg", "Un tueur à gages répondant au nom de Léon prend sous son aile Mathilda, une petite fille de douze ans, seule rescapée du massacre de sa famille. Bientôt, Léon va faire de Mathilda une nettoyeuse, comme lui. Et Mathilda pourra venger son petit frère...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Avengers : Infinity War", "2018-04-25", "film", " horreur action", "https://image.tmdb.org/t/p/w500/uIMcxe36h9K3K1RFuhCtdo0UiY9.jpg", "Les Avengers et leurs alliés devront être prêts à tout sacrifier pour neutraliser le redoutable Thanos avant que son attaque éclair ne conduise à la destruction complète de l’univers.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Love, Simon", "2018-02-16", "film", " comedie", "https://image.tmdb.org/t/p/w500/qnA8dIE9yrI4KGO9qgemu79YBCR.jpg", "Pourtant pour Simon, c’est compliqué. Il a une vie normale, dans une famille  qu'il adore et entouré d'amis extraordinaires, mais il garde pour lui un grand secret: personne ne sait qu’il est gay et il ne connait pas l’identité de son premier coup de cœur, avec qui il communique en ligne. Alors que son secret est menacé d’être révélé, la  vie  de Simon bascule dans une aventure aussi drôle que bouleversante... Ses amis prendront alors une place essentielle pour l’aider à changer sa vie et découvrir le premier amour.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Temps modernes", "1936-02-05", "film", " comedie", "https://image.tmdb.org/t/p/w500/yPYmlvwjhf3RN9D6S5iherLhifd.jpg", "Charlot est ouvrier dans une gigantesque usine. Il resserre quotidiennement des boulons. Mais les machines, le travail à la chaîne le rendent malade, il abandonne son poste, recueille une orpheline et vit d'expédients. Le vagabond et la jeune fille vont s'allier pour affronter ensemble les difficultés de la vie...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Seven", "1995-09-22", "film", " policier", "https://image.tmdb.org/t/p/w500/sQGY0TD5od0JUDAyIjo6PE1FVFT.jpg", "Pour conclure sa carrière, l'inspecteur Somerset, vieux flic blasé, tombe à sept jours de la retraite sur un criminel peu ordinaire. John Doe, c'est ainsi que se fait appeler l'assassin, a décidé de nettoyer la société des maux qui la rongent en commettant sept meurtres basés sur les sept péchés capitaux : la gourmandise, l'avarice, la paresse, l'orgueil, la luxure, l'envie et la colère.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'Accusé", "2016-09-22", "film", " policier", "https://image.tmdb.org/t/p/w500/9C3kmMtwtddbZSHsGpVZAueFYmy.jpg", "La vie de l'homme d'affaires Adrián Doria tourne au cauchemar le jour où il se réveille aux côtés de sa petite-amie sans vie, dans une chambre d'hôtel. Convaincu de son innocence, il engage une grande avocate afin de comprendre ce qu'il s'est réellement passé et prouvé son innocence mais l'arrivée imprévue d'un témoin à charge, va les obliger à remanier totalement, contre la montre, leur stratégie de défense...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Inception", "2010-07-15", "film", " horreur action", "https://image.tmdb.org/t/p/w500/n9dwu1p5G4qJ4DI5eHJMUbAdOfA.jpg", "Dom Cobb est un voleur expérimenté, le meilleur dans l'art dangereux de l'extraction, voler les secrets les plus intimes enfouis au plus profond du subconscient durant une phase de rêve, lorsque l'esprit est le plus vulnérable. Les capacités de Cobb ont fait des envieux dans le monde tourmenté de l'espionnage industriel alors qu'il devient fugitif en perdant tout ce qu'il a un jour aimé. Une chance de se racheter lui est alors offerte. Une ultime mission grâce à laquelle il pourrait retrouver sa vie passée mais uniquement s'il parvient à accomplir l'impossible inception.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Seigneur des anneaux : La Communauté de l'anneau", "2001-12-18", "film", " action", "https://image.tmdb.org/t/p/w500/1rF04Kk1eunZHk9OHPFwv8hllRF.jpg", "Le jeune et timide Hobbit, Frodon Sacquet, hérite d'un anneau. Bien loin d'être une simple babiole, il s'agit de l'Anneau Unique, un instrument de pouvoir absolu qui permettrait à Sauron, le Seigneur des ténèbres, de régner sur la Terre du Milieu et de réduire en esclavage ses peuples. À moins que Frodon, aidé d'une Compagnie constituée de Hobbits, d'Hommes, d'un Magicien, d'un Nain, et d'un Elfe, ne parvienne à emporter l'Anneau à travers la Terre du Milieu jusqu'à la Crevasse du Destin, lieu où il a été forgé, et à le détruire pour toujours. Un tel périple signifie s'aventurer très loin en Mordor, les terres du Seigneur des ténèbres, où est rassemblée son armée d'Orques maléfiques... La Compagnie doit non seulement combattre les forces extérieures du mal mais aussi les dissensions internes et l'influence corruptrice qu'exerce l'Anneau lui-même.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Silence des Agneaux", "1991-02-01", "film", " policier", "https://image.tmdb.org/t/p/w500/qCOKx82fRVzHsSHZIvhDBIOSAY8.jpg", "Un psychopathe connu sous le nom de Buffalo Bill sème la terreur dans le Middle West en kidnappant et en assassinant de jeunes femmes. Clarice Starling, une jeune agent du FBI, est chargée d'interroger l'ex-psychiatre Hannibal Lecter. Psychopathe redoutablement intelligent et porté sur le cannibalisme, Lecter est capable de lui fournir des informations concernant Buffalo Bill ainsi que son portrait psychologique. Mais il n'accepte de l'aider qu'en échange d'informations sur la vie privée de la jeune femme. Entre eux s'établit un lien de fascination et de répulsion.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Intouchables", "2011-11-02", "film", " comedie", "https://image.tmdb.org/t/p/w500/c514XwT4r6BMthqBcTIU1w0Ze2I.jpg", "A la suite d’un accident de parapente, Philippe, riche aristocrate, engage comme aide à domicile Driss, un jeune de banlieue tout juste sorti de prison… Bref la personne la moins adaptée pour le job. Ensemble ils vont faire cohabiter Vivaldi et Earth Wind and Fire, le verbe et la vanne, les costumes et les bas de survêtement… Deux univers vont se téléscoper, s’apprivoiser, pour donner naissance à une amitié aussi dingue, drôle et forte qu’inattendue, une relation unique qui fera des étincelles et qui les rendra… Intouchables.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Pigeon", "1958-06-06", "film", " comedie policier", "https://image.tmdb.org/t/p/w500/pKx6JRHxuI412sOAhGixp3yiPaZ.jpg", "Cosimo se fait arrêter par la police alors qu'il tente de dérober une voiture. Pour sortir de prison plus rapidement, il demande à ses complices extérieurs de lui trouver un pigeon, quelqu'un qui prendra sa place derrière les barreaux. C'est Pepe, boxeur à la manque, qui se présente au directeur de la prison pour clamer sa culpabilité ; mais celui-ci décide de les coffrer tous les deux. Abusé par une ruse, Cosimo révèle à Pepe les détails de son prochain coup, infaillible, qu'il se réserve pour sa sortie. Mais Pepe sort plus tôt que prévu et organise le casse avec les complices de Cosimo...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Seigneur des anneaux : Les Deux Tours", "2002-12-18", "film", " action", "https://image.tmdb.org/t/p/w500/7RLrUQH2qnCw4To5nVwRAdywGVy.jpg", "Après la mort de Boromir et la disparition de Gandalf, la Communauté s'est scindée en trois. Perdus dans les collines d'Emyn Muil, Frodon et Sam découvrent qu'ils sont suivis par Gollum, une créature versatile corrompue par l'Anneau. Celui-ci promet de conduire les Hobbits jusqu'à la Porte Noire du Mordor. À travers la Terre du Milieu, Aragorn, Legolas et Gimli font route vers le Rohan, le royaume assiégé de Theoden. Cet ancien grand roi, manipulé par l'espion de Saroumane, le sinistre Langue de Serpent, est désormais tombé sous la coupe du malfaisant Magicien. Eowyn, la nièce du Roi, reconnaît en Aragorn un meneur d'hommes. Entretemps, les Hobbits Merry et Pippin, prisonniers des Uruk-hai, se sont échappés et ont découvert dans la mystérieuse Forêt de Fangorn un allié inattendu : Sylvebarbe, gardien des arbres, représentant d'un ancien peuple végétal dont Saroumane a décimé la forêt...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Retour vers le futur", "1985-07-03", "film", " horreur comedie", "https://image.tmdb.org/t/p/w500/mAZwHkJJtIkZT5jjrbTKbBVOrNN.jpg", "1985. Le jeune Marty McFly mène une existence anonyme auprès de sa petite amie Jennifer, seulement troublée par sa famille en crise et un proviseur qui serait ravi de l'expulser du lycée. Ami de l'excentrique professeur Emmett Brown, il l'accompagne un soir tester sa nouvelle expérience : le voyage dans le temps via une DeLorean modifiée. La démonstration tourne mal : des trafiquants d'armes débarquent et assassinent le scientifique. Marty se réfugie dans la voiture et se retrouve transporté en 1955. Là, il empêche malgré lui la rencontre de ses parents, et doit tout faire pour les remettre ensemble, sous peine de ne pouvoir exister...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Bingo", "2017-08-24", "film", " comedie", "https://image.tmdb.org/t/p/w500/twXRzS0vloJboUiLkvrMFvFf2qD.jpg", "Dans les années 1980, Arlindo Barreto est embauché pour un travail qui le met sur le devant de la scène. Sous son maquillage, sa perruque rouge et ses habits de clown, il devient le présentateur du show TV Bingo, qui réveille les enfants chaque matin. Mais, loin des caméras, Arlindo doit garder son identité secrète et côtoie le monde de la drogue, jusqu’à ce qu’il trouve grâce à son fils et la religion la force de se reconstruire.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Fanfaron", "1962-12-04", "film", " comedie", "https://image.tmdb.org/t/p/w500/20oEBgtL1X7SCpfj562Q3jK3CHz.jpg", "Un Méditerranéen très en verve, désinvolte, charmeur et... fanfaron, fait la connaissance d'un étudiant en droit studieux, timide et complexé. Il va lui faire vivre deux jours de randonnées trépidantes de Rome à Viareggio...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Kid", "1921-01-21", "film", " comedie", "https://image.tmdb.org/t/p/w500/90R3CEsGbEXownQQUwOhoSO1yWA.jpg", "Un pauvre vitrier recueille un enfant abandonné par sa mère victime d'un séducteur. L'enfant casse des carreaux pour aider son père adoptif, qui l'arrache à des dames patronnesses, puis le rend à sa mere, devenue riche.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Usual suspects", "1995-07-19", "film", " policier", "https://image.tmdb.org/t/p/w500/nG4hOu54DtFQXGKH0qCPIH3cRpW.jpg", "Une légende du crime contraint 5 malfrats à aller s'acquitter d'une tâche très périlleuse. Ceux qui survivent pourront se partager un butin de 91 millions de dollars.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La garçonnière", "1960-06-15", "film", " comedie", "https://image.tmdb.org/t/p/w500/puRnwIQd6VdQqefketctjeuhsvd.jpg", "C.C. Baxter est employé à la Sauvegarde, grande compagnie d'assurance. Dans l'espoir d'un avancement il prête souvent son appartement à ses supérieurs qui y emmènent leurs petites amies. Un jour le chef du personnel le convoque et lui apprend qu'il sait tout et lui demande aussi sa clé. Baxter est enfin promu. Mais ce qu'il ignorait c'est que le chef du personnel emmenait dans son appartement la femme dont il était amoureux.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Guerre des étoiles", "1977-05-25", "film", " horreur action", "https://image.tmdb.org/t/p/w500/yVaQ34IvVDAZAWxScNdeIkaepDq.jpg", "Il y a bien longtemps, dans une galaxie très lointaine... La guerre civile fait rage entre l'Empire galactique et l'Alliance rebelle. Capturée par les troupes de choc de l'Empereur menées par le sombre et impitoyable Dark Vador, la princesse Leia Organa dissimule les plans de l’Étoile Noire, une station spatiale invulnérable, à son droïde R2-D2 avec pour mission de les remettre au Jedi Obi-Wan Kenobi. Accompagné de son fidèle compagnon, le droïde de protocole C-3PO, R2-D2 s'échoue sur la planète Tatooine et termine sa quête chez le jeune Luke Skywalker. Rêvant de devenir pilote mais confiné aux travaux de la ferme, ce dernier se lance à la recherche de ce mystérieux Obi-Wan Kenobi, devenu ermite au cœur des montagnes désertiques de Tatooine...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Shining", "1980-05-22", "film", "", "https://image.tmdb.org/t/p/w500/lCVa5zPmAZmzoEXJTyGKSuiW1H9.jpg", "Jack Torrance, gardien d'un hôtel fermé l'hiver, sa femme et son fils Danny s'apprêtent à vivre de longs mois de solitude. Danny, qui possède un don de médium, le Shining, est effrayé à l'idée d'habiter ce lieu, théâtre marqué par de terribles évènements passés...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Old Boy", "2003-09-28", "film", " action", "https://image.tmdb.org/t/p/w500/if5bkQK6FxOQhKd9czd25HpdCCh.jpg", "À la fin des années 80, Oh Dae-Soo, père de famille sans histoire, est enlevé un jour devant chez lui. Séquestré pendant plusieurs années dans une cellule privée, son seul lien avec l'extérieur est une télévision. Par le biais de cette télévision, il apprend le meurtre de sa femme, meurtre dont il est le principal suspect. Au désespoir d'être séquestré sans raison apparente succède alors chez le héros une rage intérieure vengeresse qui lui permet de survivre. Il est relâché 15 ans plus tard, toujours sans explication. Oh Dae-Soo est alors contacté par celui qui semble être le responsable de ses malheurs, qui lui propose de découvrir qui l'a enlevé et pourquoi. Le cauchemar continue pour le héros.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "3 Billboards : Les Panneaux de la vengeance", "2017-11-10", "film", " policier", "https://image.tmdb.org/t/p/w500/sMCwnc7tY6ULz8CkiGXV3wU6I8A.jpg", "Après des mois sans que l'enquête sur la mort de sa fille ait avancé, Mildred Hayes prend les choses en main, affichant un message controversé visant le très respecté chef de la police sur trois grands panneaux à l'entrée de leur ville.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Assurance sur la mort", "1944-04-24", "film", " policier", "https://image.tmdb.org/t/p/w500/d2aEsgeFcHO3l7s79vvSqgZMO6Y.jpg", "Walter Neff, un employé d'une compagnie d'assurances, tombe amoureux de sa cliente et échafaude avec elle un plan pour supprimer le mari encombrant et ainsi partager avec elle l'assurance-vie de ce dernier.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Rashômon", "1950-12-26", "film", " policier", "https://image.tmdb.org/t/p/w500/y9fenfYj0ewNLDplu0xCquwVuuO.jpg", "Kyoto, au XIe siècle. Sous le portique d'un vieux temple en ruines, Rashômon, trois hommes s'abritent de la pluie. Les guerres et les famines font rage. Pourtant un jeune moine et un vieux bûcheron sont plus terrifiés encore par le procès auquel ils viennent d'assister. Ils sont si troublés qu'ils vont obliger le troisième voyageur à écouter le récit de ce procès : celui d'un célèbre bandit accusé d'avoir violé une jeune femme et tué son mari, un samouraï. Le drame a eu lieu dans la forêt à l'orée de laquelle est situé le portique de Rashômon. L'histoire est simple : Qui a tué le mari ? Le bandit Tajomaru, la femme, un bûcheron qui passait ou le mari lui-même qui se serait suicidé ? Autant d'hypothèses vraisemblables. Mais les dépositions des témoins devant le tribunal apportent à chaque fois une version différente du drame, et la vérité ne percera qu'après de nouvelles révélations surprenantes...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Taxi Driver", "1976-02-07", "film", " policier", "https://image.tmdb.org/t/p/w500/ekstpH614fwDX8DUln1a2Opz0N8.jpg", "Vétéran de la Guerre du Vietnam, Travis Bickle est chauffeur de taxi dans la ville de New York. Ses rencontres nocturnes et la violence quotidienne dont il est témoin lui font peu à peu perdre la tête. Il se charge bientôt de délivrer une prostituée mineure de ses souteneurs.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Certains l'aiment chaud", "1959-03-18", "film", " comedie", "https://image.tmdb.org/t/p/w500/ciVSRvAbE8Grdeno4ud7zztRxFU.jpg", "Deux musiciens de jazz au chômage, mêlés involontairement à un règlement de comptes entre gangsters, se transforment en musiciennes pour leur échapper. Ils partent en Floride avec un orchestre féminin. Ils tombent illico amoureux d'une ravissante et blonde créature, Alouette, qui veut épouser un milliardaire.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Reservoir Dogs", "1992-09-02", "film", " policier", "https://image.tmdb.org/t/p/w500/b62t5xsAMGZ2LOLbD0l85xQE3tr.jpg", "Après un hold-up manqué, des cambrioleurs de haut vol font leurs comptes dans une confrontation violente, pour découvrir lequel d'entre eux les a trahis.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sur les quais", "1954-06-22", "film", " policier", "https://image.tmdb.org/t/p/w500/ocIdm09qu8ASV0B6pasQw4r2Kx8.jpg", "Un jeune docker, Terry Malloy, ancien boxeur, est manipulé par son frère, avocat du syndicat des dockers dirigé par le crapuleux Johnny Friendly. Il assiste sans intervenir au meurtre d'un employé qui voulait dénoncer les méthodes illégales de ce dernier. Malloy se retrouve devant un cas de conscience...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sherlock, Jr.", "1924-04-21", "film", " action comedie", "https://image.tmdb.org/t/p/w500/1G9r3rqtbFAQuyWKOZm4Y5J5s7Q.jpg", "Un projectionniste s'endort et retrouve en reve son amie, son rival et vit de nombreuses aventures.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dr Folamour", "1964-01-29", "film", " comedie", "https://image.tmdb.org/t/p/w500/kzeH0qI7j8OphsrLtb8peapgbuw.jpg", "Le général Jack Ripper, convaincu que les Russes ont décidé d'empoisonner l'eau potable des États-Unis, lance sur l'URSS une offensive de bombardiers B-52 en ayant pris soin d'isoler la base aérienne de Burpelson du reste du monde. Pendant ce temps, Muffley, le Président des États-Unis, convoque l'état-major militaire dans la salle d'opérations du Pentagone et tente de rétablir la situation.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le mécano de la « General »", "1926-12-31", "film", " action comedie", "https://image.tmdb.org/t/p/w500/yoF4rGE2aPhxBMSRFeZ1yio6Rau.jpg", "Conducteur de locomotive, Johnnie Gray habite à Marietta, en Géorgie. Il est fiancé à Annabelle Lee. La guerre de Sécession éclate : le père et le frère de la jeune fille sont incorporés. Pas Johnny, qu'on juge plus utile à son poste et qu'entache ainsi, aux yeux de tous et même de sa fiancée, un soupçon de couardise. Un jour, des soldats nordistes volent sa locomotive, la «General», et enlèvent dans la foulée sa fiancée, Annabelle Lee. De peur d'être définitivement pris pour un lâche, Johnnie s'en va-t-en guerre : il se lance seul à la poursuite des voleurs...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Qu'est-il arrivé à Baby Jane ?", "1962-10-31", "film", "", "https://image.tmdb.org/t/p/w500/54ZvvBJXEp12EGioxOrBiXieyHv.jpg", "Au temps du cinéma muet, Baby Jane est une grande star, une des premières enfants prodiges. Sa soeur Blanche, timide et réservée, reste dans l'ombre. Dans les années 30, les rôles sont inversés, Blanche est une grande vedette, Jane est oubliée. Désormais, bien des années après, elles vivent en commun une double névrose. Blanche, victime d'un mystérieux accident, est infirme et semble tout accepter d'une soeur transformée en infirmière sadique qui multiplie les mauvais traitements...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Tel chi el telùn", "2009-03-01", "film", " comedie", "https://image.tmdb.org/t/p/w500/hfVkk9FOJJkVps1ahdun4mq7m4J.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "M le maudit", "1931-05-11", "film", " action policier", "https://image.tmdb.org/t/p/w500/j87uFsmlDU5n3ZpxaKn6qhp8fuq.jpg", "Un sadique assassine des petites filles. La pègre et la police se mettent à le rechercher.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Dolce vita", "1960-02-05", "film", " comedie", "https://image.tmdb.org/t/p/w500/l1QsL7eReqUhwc2iBG8jZ24IcRp.jpg", "Le chroniqueur Marcello fait le tour des lieux à scandale de Rome pour alimenter les potins d'un journal à fort tirage. Il rencontre une faune corrompue et dérisoire qui feint de s'amuser et dissimule mal son ennui.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Scarface", "1983-12-08", "film", " action policier", "https://image.tmdb.org/t/p/w500/kECJXf8IsrWgrrqC4cLgf6c8hP8.jpg", "En 1980, le gouvernement cubain expulse plusieurs centaines de prisonniers dangereux vers la Floride. Parmi eux, Tony Montana : ambitieux et sans scrupules, il élabore un plan pour prendre la place d'un caïd de la drogue.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Ran", "1985-06-01", "film", " action", "https://image.tmdb.org/t/p/w500/lSDJ4Wl2BWHEdkYmuPzgnfjoimL.jpg", "Dans le Japon du XVIème siècle, le seigneur Hidetora Ichimonji décide de se retirer et de partager son domaine entre ses trois fils, Taro, Jiro et Saburo. Mais la répartition de cet héritage va déchirer la famille.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Infiltrés", "2006-10-05", "film", " policier", "https://image.tmdb.org/t/p/w500/k8LxrSomWzf1dV1YdLadMiDsBZD.jpg", "À Boston, une lutte sans merci oppose la police à la pègre irlandaise. Pour mettre fin au règne du parrain Frank Costello, la police infiltre son gang avec « un bleu » issu des bas quartiers, Billy Costigan. Tandis que Billy s'efforce de gagner la confiance du malfrat vieillissant, Colin Sullivan entre dans la police au sein de l'Unité des Enquêtes Spéciales, chargée d'éliminer Costello. Mais Colin fonctionne en « sous-marin »et informe Costello des opérations qui se trament contre lui. Risquant à tout moment d'être démasqués, Billy et Colin sont contraints de mener une double vie qui leur fait perdre leurs repères et leur identité. Traquenards et contre-offensives s'enchaînent jusqu'au jour où chaque camp réalise qu'il héberge une taupe. Une course contre la montre s'engage entre les deux hommes avec un seul objectif : découvrir l'identité de l'autre sous peine d'y laisser sa peau...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Des nouilles aux haricots noirs", "2009-05-14", "film", " comedie", "https://image.tmdb.org/t/p/w500/wVDuDqn4ZPIhfdr7gyS2dKE0XPl.jpg", "Kim Seong-geun (Jae-yeong Jeong) tente de se suicider en sautant du haut d'un pont de la rivière Han en plein cœur de Séoul. Il reprend connaissance sur une île abandonnée sans possibilité de retour à la civilisation. De l'autre côté de la rivière, vit une jeune fille (Ryeo-won Jeong) qui, après un terrible choc, n'est pas sortie de sa chambre depuis des années. S'augurant d'une vie fictive via un blog et restant coupée de la société actuelle, elle apercevra l'homme échoué alors qu'elle prenait des clichés de la Lune. Jour après jour, en observant les moindres faits et gestes de Kim, sa vie de solitaire se retrouvera bouleversée.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Chantons sous la pluie", "1952-04-10", "film", " comedie", "https://image.tmdb.org/t/p/w500/uPGcqcsYftGOPWxdsIw2RdLczzv.jpg", "Don Lockwood et Lina Lamont sont le couple star du moment à Hollywood. Mais lorsque le parlant arrive, la voix de crécelle de Lina menace la carrière du duo...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "À tous les garçons que j'ai aimés", "2018-08-16", "film", " comedie", "https://image.tmdb.org/t/p/w500/hKHZhUbIyUAjcSrqJThFGYIR6kI.jpg", "La discrète Lara Jean menait une vie invisible au lycée, mais quand ses lettres d'amour secrètes sont envoyées à chacun de ses cinq béguins, tout change radicalement.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Forteresse cachée", "1958-12-28", "film", " action comedie", "https://image.tmdb.org/t/p/w500/8POoCcLejrf6NsNWk9mEGBdhTO.jpg", "Un groupe formé d'un général, de deux paysans et d'une princesse qui détient le trésor du clan va tenter de rejoindre un territoire ami à travers les affres de la guerre civile du XVIème siècle japonais.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Memories Of Murder", "2003-04-24", "film", " policier", "https://image.tmdb.org/t/p/w500/3pvAhrH7fxlKv6ekYIxVxk8Gq6i.jpg", "Province de Gyunggi 1986. Le corps d'une jeune femme brutalement violée puis assassinée est retrouvé dans la campagne. Deux mois plus tard, d'autres crimes similaires ont lieu. Dans un pays qui n'a jamais connu de telles atrocités, la rumeur d'actes commis par un serial killer grandit de jour en jour. Une unité spéciale de la police est ainsi créée dans la région afin de trouver rapidement le coupable. Elle est placée sous les ordres d'un policier local et d'un détective spécialement envoyé de Séoul à sa demande. Devant l'absence de preuves concrètes, les deux hommes sombrent peu à peu dans le doute...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Inglourious Basterds", "2009-08-18", "film", " action", "https://image.tmdb.org/t/p/w500/8tGwyOdcYn4MljAwlFamxBUEaTi.jpg", "Dans la France occupée de 1941, Shosanna Dreyfus assiste à l'exécution de sa famille tombée entre les mains du colonel nazi Hans Landa. Shosanna s'échappe de justesse et s'enfuit à Paris où elle se construit une nouvelle identité en devenant exploitante d'une salle de cinéma. Quelque part ailleurs en Europe, le lieutenant Aldo Raine forme un groupe de soldats juifs américains pour mener des actions punitives particulièrement sanglantes contre les nazis. « Les bâtards », nom sous lequel leurs ennemis vont apprendre à les connaître, se joignent à l'actrice allemande et agent secret Bridget von Hammersmark pour tenter d'éliminer les hauts dignitaires du Troisième Reich. Leurs destins vont se jouer à l'entrée du cinéma où Shosanna est décidée à mettre à exécution une vengeance très personnelle.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Thriller de Michael Jackson", "1983-11-14", "film", "", "https://image.tmdb.org/t/p/w500/dxi3fkAtPm4c5Sw2KJNM7nawhsw.jpg", "Une nuit au cinéma se transforme en un cauchemar quand Michael et sa date d'sont attaqués par une horde de zombies sanguinaires assoiffés.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Gladiator", "2000-05-01", "film", " action", "https://image.tmdb.org/t/p/w500/3IGZhnjEzZwStzcNOfwICfWikrX.jpg", "Le général romain Maximus est le plus fidèle soutien de l'empereur Marc Aurèle, qu'il a conduit de victoire en victoire avec une bravoure et un dévouement exemplaires. Jaloux du prestige de Maximus, et plus encore de l'amour que lui voue l'empereur, le fils de Marc Aurèle, Commode, s'arroge brutalement le pouvoir, puis ordonne l'arrestation du général et son exécution. Maximus échappe à ses assassins mais ne peut empêcher le massacre de sa famille. Capturé par un marchand d'esclaves, il devient gladiateur et prépare sa vengeance.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Matrix", "1999-03-30", "film", " horreur action", "https://image.tmdb.org/t/p/w500/LCcZvB2Ynxg7JOQgviGwZ3l66L.jpg", "Programmeur anonyme dans un service administratif le jour, Thomas Anderson devient Neo la nuit venue. Sous ce pseudonyme, il est l'un des pirates les plus recherchés du cyber-espace. À cheval entre deux mondes, Neo est assailli par d'étranges songes et des messages cryptés provenant d'un certain Morpheus. Celui-ci l'exhorte à aller au-delà des apparences et à trouver la réponse à la question qui hante constamment ses pensées : qu'est-ce que la Matrice ? Nul ne le sait, et aucun homme n'est encore parvenu à en percer les défenses. Mais Morpheus est persuadé que Neo est l’Élu, le libérateur mythique de l'humanité annoncé selon la prophétie. Ensemble, ils se lancent dans une lutte sans retour contre la Matrice et ses terribles agents...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Trésor de la Sierra Madre", "1948-01-24", "film", " action", "https://image.tmdb.org/t/p/w500/qyN5qGUxfXFXLuuRwDScRxOiqhz.jpg", "Dobbs et Curtis travaillent sur un chantier dont le chef part avec le salaire des ouvriers. Ils partent à sa recherche et récupèrent leur argent. Puis ils s'associent avec le vieil Howard pour exploiter un filon d'or dans la Sierra Madre.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Alien, le huitième passager", "1979-05-25", "film", " horreur", "https://image.tmdb.org/t/p/w500/l8CES84JndFlNfBNMxdLRYaLvI6.jpg", "En 2122. Le Nostromo, vaisseau de commerce, fait route vers la Terre avec à son bord un équipage de sept personnes en hibernation et une cargaison de minerais. Il interrompt soudain sa course suite à la réception d'un mystérieux message provenant d'une planète inexplorée. Réveillé par l'ordinateur de bord, l'équipage se rend sur place et découvre les restes d'un gigantesque vaisseau extraterrestre dont le seul passager semble être mort dans d'étranges circonstances...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Du silence et des ombres", "1962-12-25", "film", " policier", "https://image.tmdb.org/t/p/w500/mxCLPziKJUgqZ1XoMnDLMdi3Kke.jpg", "Atticus Finch, un avocat dans le sud des États-Unis des années 1930 doit défendre un homme noir accusé de viol. Le récit, raconté à travers les souvenirs et le regard de ses enfants Scout et Jem, est parsemé de détails sur la vie et les mentalités de l'époque ainsi que d'anecdotes de voisinages (dont certaines inspirées des souvenirs d'enfance de l'auteur du roman).", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Coco", "2017-10-27", "film", " comedie", "https://image.tmdb.org/t/p/w500/sZqcEV3KhDITHlUBmyj1a3RRvT9.jpg", "Malgré la décevante absence totale de musique dans sa famille depuis des générations, Miguel rêve de devenir un grand musicien comme son idole Ernesto de la Cruz. Désespéré de pouvoir un jour montrer ses talents, il se retrouve à la suite d'un mystérieux enchaînement d'évènements dans l'incroyavle et coloré Royaume des Morts. Sur sa route, il rencontre l'escroc charmeur Hector et ensemble, ils partent pour un voyage extraordinaire pour découvrir la véritable histoire cachée de la famille de Miguel.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'arnaque", "1973-12-25", "film", " comedie policier", "https://image.tmdb.org/t/p/w500/23pgQqSLuq7PJoOba9QJdCWPfrG.jpg", "A Chicago, en 1936, Johnny Hooker et son acolyte Coleman volent sans le savoir le convoyeur de fonds de Doyle Lonnegan, un dangereux gangster de New York. Coleman est aussitôt abattu par le gang de ce dernier et Hooker se réfugie chez Henry Gondorff, un spécialiste de l'arnaque.Ceux-ci décident alors de venger la mort de Coleman en montant une vaste escroquerie destinée à mettre Lonnegan sur la paille. Pour cela, Hooker fait croire au gangster qu'il est capable d'obtenir les résultats des courses avant qu'ils ne soient officiellement connus.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Cirque", "1928-01-06", "film", " comedie", "https://image.tmdb.org/t/p/w500/qYA44gx6EaHkxCZEXlmCWMOUkxZ.jpg", "Charlot, pris pour un pickpocket, se réfugie dans un cirque et déboule sur la piste en plein spectacle. Son arrivée fait rire le public et le directeur l'engage aussitôt comme clown. Charlot devient amoureux de l'écuyère mais son rival le fait renvoyer.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sanjûrô", "1962-01-01", "film", " action comedie", "https://image.tmdb.org/t/p/w500/4zCCcHHEo4ac6kzJr2zzjOAUT0r.jpg", "Le samouraï rônin Sanjuro Tsubaki prend sous son aile une bande de jeunes guerriers inexpérimentés et les aide à déjouer un complot contre le chambellan. Jouant de ruse avec les conspirateurs, Sanjuro se révélera un tacticien hors pair, avant de se confronter avec le redoutable Muroto, bras droit du chef des comploteurs.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Grand Budapest Hotel", "2014-02-26", "film", " comedie", "https://image.tmdb.org/t/p/w500/gPZ6dO8cKCahCjJJvk5UhUBTJ9N.jpg", "Pendant l'entre-deux guerres, le légendaire concierge d'une grand hôtel et son jeune protégé se retrouvent impliqués dans une histoire mêlant le vol d'un tableau de la Renaissance, la bataille pour une énorme fortune familiale, et le lent puis soudain bouleversement qui transforme l'Europe en cette première moitié de XXème siècle.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Au revoir là-haut", "2017-10-25", "film", " policier", "https://image.tmdb.org/t/p/w500/zc1NSy1aMJbsBTJBgN6CZfSEQrR.jpg", "Novembre 1918. À quelques jours de l’Armistice, Edouard Péricourt sauve Albert Maillard d'une mort certaine. Rien en commun entre ces deux hommes si ce n’est la guerre et le lieutenant Pradelle qui, en donnant l’ordre d’un assaut absurde, brise leurs vies en même temps qu’il lie leurs destins.  Sur les ruines du carnage de la première guerre mondiale, chacun va tâcher de survivre : Pradelle s'apprête à faire fortune sur le dos des morts tandis qu'Albert et Edouard, condamnés à vivre, vont tenter de monter une arnaque monumentale.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Requiem for a Dream", "2000-10-06", "film", " policier", "https://image.tmdb.org/t/p/w500/vjGpKvxOAGWFPXeRITgQlIvxF3i.jpg", "Harry Goldfarb est un junkie. Il passe ses journées en compagnie de sa petite amie Marion et son copain Tyrone. Ensemble, ils s'inventent un paradis artificiel. En quête d'une vie meilleure, le trio est entraîné dans une spirale infernale qui les enfonce toujours un peu plus dans l'angoisse et le désespoir. La mère d'Harry, Sara, souffre d'une autre forme d'addiction, la télévision. Juive, fantasque et veuve depuis des années, elle vit seule à Coney Island et nourrit dans le secret l'espoir de participer un jour à son émission préférée. Afin de satisfaire aux canons esthétiques de la télévision, elle s'astreint à un régime draconien. Un jour, elle le sait, elle passera de l'autre côté de l'écran.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Corde", "1948-08-23", "film", " policier", "https://image.tmdb.org/t/p/w500/3dDqc837ekV0nwNd23NrKhF8G70.jpg", "Deux étudiants en suppriment un troisième, pour la seule beauté du geste. Défi suprême, le meurtre précède de peu une soirée ou ils reçoivent les parents de la victime et leur ancien professeur.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'ange exterminateur", "1962-05-16", "film", " comedie", "https://image.tmdb.org/t/p/w500/sjV8ca170TCl7njW5oOYcJW9crS.jpg", "Edmundo et Lucia de Nobile, un couple bourgeois de Mexico, donnent une réception après l'opéra dans leur luxueuse demeure. Quelques faits bizarres se produisent alors : des domestiques partent sans expliquer leur comportement, les invités connaissent une impression de déjà vu, Ana retire de son sac deux pattes de poulet alors que Blanca joue au piano une sonate de Paradisi. Au moment de partir, une étrange réaction interdit aux invités de quitter les lieux. Ces derniers finissent par dormir sur place. Mais le lendemain matin, ils constatent qu'il est toujours impossible de sortir du salon.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La nuit du chasseur", "1955-04-03", "film", " policier", "https://image.tmdb.org/t/p/w500/y3gPAmVc4qoKMmj5W4zqdFYR15x.jpg", "Un prêcheur inquiétant poursuit dans l'Amérique rurale deux enfants dont le père vient d'être condamné pour vol et meurtre. Avant son incarcération, le père leur avait confié dix milles dollars, dont ils doivent révéler l'existence à personne. Pourchassés sans pitié par ce pasteur psychopathe et abandonnés à eux-mêmes, les enfants se lancent sur les routes.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Crime était presque parfait", "1954-05-29", "film", " policier", "https://image.tmdb.org/t/p/w500/nfxP4gOCa2T7ZC6fjiRYrMpKmFg.jpg", "Tony Wendice, une ancienne gloire du tennis, s'est marié avec Margot pour sa richesse. Mais celle-ci le trompe depuis peu avec Mark Halliday, un jeune auteur de romans policiers.Craignant que sa femme le quitte et le laisse sans le sou, Tony fait appel au capitaine Lesgate et le charge d'assassiner Margot en échange d'une grosse somme d'argent.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Chungking Express", "1994-07-14", "film", " comedie", "https://image.tmdb.org/t/p/w500/7ejz2cc6tMpuTb7hz4oUi9uW7O9.jpg", "L'histoire de deux flics lâchés par leur petite amie. Le matricule 223 qui se promet de tomber amoureux de la première femme qui entrera dans un bar a Chungking House ou il noie son chagrin. Le matricule 663, qui chaque soir passe au Midnight Express, un fast-food du quartier de Lan Kwai Fong, acheter a la jolie Faye une Chef Salad qu'il destine a sa belle, une hôtesse de l'air.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Tre Uomini e una Gamba", "1997-12-27", "film", " comedie", "https://image.tmdb.org/t/p/w500/47FnOHM0PLubcolYrHmGlP0wi2A.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Truman show", "1998-06-04", "film", " comedie", "https://image.tmdb.org/t/p/w500/vFj5hoNJ26KYyIWU7AZ2ujxKQCx.jpg", "Truman Burbank mène une vie calme et heureuse. Il habite dans un petit pavillon propret de la radieuse station balnéaire de Seahaven. Il part tous les matins à son bureau d'agent d'assurances dont il ressort huit heures plus tard pour regagner son foyer, savourer le confort de son habitat modèle, la bonne humeur inaltérable et le sourire mécanique de sa femme, Meryl. Mais parfois, Truman étouffe sous tant de bonheur et la nuit l'angoisse le submerge. Il se sent de plus en plus étranger, comme si son entourage jouait un rôle. Pis encore, il se sent observé.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Troupe d'élite", "2007-10-12", "film", " action policier", "https://image.tmdb.org/t/p/w500/ixJ5Teigeo7CiKeouIPWSwKjqPT.jpg", "1997, Les milices armées liées au trafic de drogue contrôlent les favelas de Rio. Rongée par la corruption, la police n'intervient plus sur le terrain. Les forces d'élite du BOPE (Bataillon des opérations spéciales de police) sont livrées à elles-mêmes dans leur lutte sans merci contre les trafiquants. Mais le maintien de l'ordre a un prix : il est de plus en plus difficile de distinguer le bien du mal, de faire la différence entre l'exigence de justice et le désir de vengeance.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Prisoners", "2013-09-18", "film", " policier", "https://image.tmdb.org/t/p/w500/qCzC2oeMFoMdbHqHEIwJBQKp2ku.jpg", "Dans la banlieue de Boston, deux fillettes de 6 ans, Anna et Joy, ont disparu. Le détective Loki privilégie la thèse du kidnapping suite au témoignage de Keller, le père d’Anna. Le suspect numéro 1 est rapidement arrêté mais est relâché quelques jours plus tard faute de preuve, entrainant la fureur de Keller. Aveuglé par sa douleur, le père dévasté se lance alors dans une course contre la montre pour retrouver les enfants disparus. De son côté, Loki essaie de trouver des indices pour arrêter le coupable avant que Keller ne commette l’irréparable… Les jours passent et les chances de retrouver les fillettes s’amenuisent…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Feux de la rampe", "1952-10-31", "film", " comedie", "https://image.tmdb.org/t/p/w500/vkiQq1ny1RwNCkIDp8qd7tf7zTv.jpg", "Un comique du music-hall déchu se prend d'affection pour une jeune danseuse paralysée.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Festin", "2014-11-07", "film", " comedie", "https://image.tmdb.org/t/p/w500/qJ9ouIj4wN24asvKTUSAcJnSfrT.jpg", "L’histoire de la vie amoureuse d’un homme vue par son chien, Winston, et révélée au fil des repas qu’ils partagent", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sing Street", "2016-03-11", "film", " comedie", "https://image.tmdb.org/t/p/w500/bup7yO6gFNbKqie8Bd2GXkNmULn.jpg", "Dublin, années 80. Conor, un lycéen dont les parents sont au bord du divorce, est obligé à contrecœur de rejoindre les bancs de l’école publique dont les règles d’éducation diffèrent de celles de l’école privée qu’il avait l’habitude de fréquenter. Il se retrouve au milieu d’élèves turbulents qui le malmènent et de professeurs exigeants qui lui font rapidement comprendre qu'en tant que petit nouveau, il va devoir filer doux. Afin de s’échapper de cet univers violent, il n’a qu’un objectif : impressionner la plus jolie fille du quartier, la mystérieuse Raphina. Il décide alors de monter un groupe et de se lancer dans la musique, univers dans lequel il ne connait rien ni personne, à part les vinyles de sa chambre d’adolescent. Afin de la conquérir,  il lui propose de jouer dans son futur clip.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sherlock: L'Effroyable Mariée", "2016-01-01", "film", " policier", "https://image.tmdb.org/t/p/w500/hjWuU7zmVjY5N6PYbr4EYeEBePv.jpg", "En 1895, Sherlock Holmes et le Dr Watson sont connus de tout Londres par les récits des aventures du détective romancés et publiés par l'ancien médecin militaire. Une affaire irrésolue par le détective, où une femme aurait tué son mari après son suicide, resurgit quand une femme vient demander de l’aide à Sherlock : son mari a reçu une lettre contenant cinq pépins d'orange et sait depuis sa mort prochaine.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Samouraï", "1967-10-25", "film", " policier", "https://image.tmdb.org/t/p/w500/cvNW8IXigbaMNo4gKEIps0NGnhA.jpg", "Jef Costello, un tueur à gages, est chargé d'éliminer le patron d'une boîte de nuit. Un soir, il exécute froidement son contrat. Valérie, la pianiste de l'établissement, l'a vu commettre son crime. Jef met alors soigneusement au point un alibi, avec l'aide de sa maîtresse, Jane Lagrange. Mais la police a des soupçons à son égard et le surveille de très près. Son employeur, dont il ignore tout, y compris son identité, tente de le faire abattre lors de la remise de la prime, sur une passerelle. Etre solitaire et glacé, enfermé dans son code de l'honneur, Jef Costello, blessé au bras, ne peut plus compter sur personne et comprend qu'il va lui falloir sauver sa peau et affronter tous ceux qui en veulent à sa vie...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Retour du Jedi", "1983-05-23", "film", " horreur action", "https://image.tmdb.org/t/p/w500/kBjuLfGqNRsby9TzWQaTlAUe3LB.jpg", "L'Empire galactique est plus puissant que jamais : la construction de la nouvelle arme, l’Étoile de la Mort, menace l'univers tout entier... Arrêté après la trahison de Lando Calrissian, Han Solo est remis à l'ignoble contrebandier Jabba Le Hutt par le chasseur de primes Boba Fett. Après l'échec d'une première tentative d'évasion menée par la princesse Leia, également arrêtée par Jabba, Luke Skywalker et Lando parviennent à libérer leurs amis. Han, Leia, Chewbacca, C-3PO et Luke, devenu un Jedi, s'envolent dès lors pour une mission d'extrême importance sur la lune forestière d'Endor, afin de détruire le générateur du bouclier de l’Étoile de la Mort et permettre une attaque des pilotes de l'Alliance rebelle. Conscient d'être un danger pour ses compagnons, Luke préfère se rendre aux mains de Dark Vador, son père et ancien Jedi passé du côté obscur de la Force.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Nuit Américaine", "1973-05-24", "film", " comedie", "https://image.tmdb.org/t/p/w500/qikf1R2CPHiBmK5k2df1dQQTd7M.jpg", "Aux studios de la Victorine, à Nice, une équipe est réunie pour le tournage d'un fim intitulé Je vous présente Pamela : Alphonse (qui incarne un jeune homme retournant dans sa famille avec sa femme anglaise Pamela), a procuré à sa petite amie, Liliane, un emploi de scipt-girl stagiaire ; Séverine (qui joue la mère du jeune homme) est troublée à l'idée que l'acteur qui doit être son mari dans le film est un de ses anciens amants ; Alexandre, un séducteur quinquagénaire. Les problèmes s'accumulent pour Ferrand, le metteur en scène : le laboratoire a abîmé une scène de foule ; Séverine, qui s'est mise à boire, rate une scène ; Stacey, une autre actrice, s'avère être enceinte. Bertrand, le producteur, se tourmente à propos de la récente dépression nerveuse de Julie Baker, l'actrice hollywoodienne qui doit jouer Pamele et qui vient d'arriver, acompagnée de son nouveau mari, le Dr Michael Nelson. Le tournage commence.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Vice-versa", "2015-06-09", "film", " comedie", "https://image.tmdb.org/t/p/w500/7N5B2fyYS95ARjyMLfX5vbAYjT1.jpg", "Grandir n’est pas de tout repos, et la petite Riley ne fait pas exception à la règle. À cause du travail de son père, elle vient de quitter le Midwest et la vie qu’elle a toujours connue pour emménager avec sa famille à San Francisco. Comme nous tous, Riley est guidée par ses émotions – la Joie, la Peur, la Colère, le Dégoût, et la Tristesse. Ces émotions vivent au Quartier Général, le centre de contrôle de l’esprit de Riley, et l’aident et la conseillent dans sa vie quotidienne. Tandis que Riley et ses émotions luttent pour se faire à leur nouvelle existence à San Francisco, le chaos s’empare du Quartier Général. Si la Joie, l’émotion dominante de Riley, tente de rester positive, les différentes émotions entrent en conflit pour définir la meilleure manière de s’en sortir quand on se retrouve brusquement dans une nouvelle ville, une nouvelle école et une nouvelle maison.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Papillon", "1973-12-13", "film", " policier", "https://image.tmdb.org/t/p/w500/jC1YdJT9cly4cULO7xbrOgYXsYo.jpg", "Henri Papillon Charrière, un malfrat de petite envergure, est jugé à tort pour un meurtre qu'il n'a pas commis. Celui-ci est condamné à vie dans une prison d'une colonie française : le bagne de Cayenne. Mais Papillon n'a qu'une seule idée en tête : s'évader. Malheureusement, ses régulières tentatives sont toujours restées sans réussite. Devant son acharnement, les dirigeants l'envoient sur Devil's Island, une prison dans la prison, dont jamais personne n'a réussi à s'échapper. Une épreuve terrible pour Papillon, qui découvre l'enfer de l'environnement carcéral...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mr. Smith au sénat", "1939-10-19", "film", " comedie", "https://image.tmdb.org/t/p/w500/cBEQXodAFPyXnMN3woaneVAf6LE.jpg", "Jefferson Smith est très aimé des Boys Rangers, un club de jeunes garçons qu'il dirige. Cet homme populaire et naïf est une affaire pour le gouverneur Hopper et son chef politique Jim Taylor, qui en font un sénateur idéal pour couvrir leurs sombres histoires. Mr. Smith devient alors vite la risée du Congrès et est, malgré lui, compromis dans une affaire louche. Après un moment de découragement et grâce à sa secrétaire, il prend la parole au Sénat et la garde vingt-trois heures durant!", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Casino", "1995-11-22", "film", " policier", "https://image.tmdb.org/t/p/w500/mWd03gDfHhk72B859a28cbXih1z.jpg", "Dans les annees soixante-dix à Las Vegas, Ace Rothstein dirige d'une main de fer l'hôtel-casino Tangiers, financé en sous-main par le puissant syndicat des camionneurs. Le Tangiers est l'un des casinos les plus prospères de la ville et Ace est devenu le grand manitou de Las Vegas, secondé par son ami d'enfance, Nicky Santoro. Impitoyable avec les tricheurs, Rothstein se laisse un jour séduire par une virtuose de l'arnaque d'une insolente beauté, Ginger McKenna. Amoureux, il lui ouvre les porte de son paradis et l'épouse. Ses ennuis commencent alors.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dans ses yeux", "2009-08-13", "film", " policier", "https://image.tmdb.org/t/p/w500/pTY6v8hipnaBehyBM0R0U0DbrAr.jpg", "1974, Buenos Aires. Benjamin Esposito enquête sur le meurtre violent d'une jeune femme.25 ans plus tard, il décide d'écrire un roman basé sur cette affaire classée dont il a été témoin et protagoniste. Ce travail d'écriture le ramène à ce meurtre qui l'obsède depuis tant d'années mais également à l'amour qu'il portait alors à sa collègue de travail. Benjamin replonge ainsi dans cette période sombre de l'Argentine où l'ambiance était étouffante et les apparences trompeuses...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Diaboliques", "1955-01-29", "film", "", "https://image.tmdb.org/t/p/w500/cpRoJq0WClB135n8LJOkfy16mPg.jpg", "Dans une institution destinée à l'éducation des jeunes garçons, Christina et Nicole, respectivement épouse et maîtresse du directeur Michel Delasalle, s'associent afin d'assassiner l'homme qu'ells ont fini par haïr. Mais quelques jours après leur méfait, le corps de Michel disparaît...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Captain Fantastic", "2016-07-02", "film", " comedie", "https://image.tmdb.org/t/p/w500/9I9Yjjneqf2Bm6VmZdqImD7RJ3d.jpg", "Dans les forêts reculées du nord-ouest des États-Unis, vivant isolé de la société, un père dévoué a consacré sa vie tout entière à faire de ses six jeunes enfants d’extraordinaires adultes. Mais quand le destin frappe sa famille, ils doivent abandonner ce paradis qu’il avait créé pour eux. La découverte du monde extérieur va l’obliger à questionner ses méthodes d’éducation et remettre en cause tout ce qu’il leur a appris.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Thing", "1982-06-25", "film", " horreur", "https://image.tmdb.org/t/p/w500/qqjYEVGqM9K7kr9d1LNNfVC0wOx.jpg", "Une base américaine isolée dans l'Antarctique est attaquée par un hélicoptère cherchant à abattre un chien de traîneau. L'engin neutralisé, les américains découvrent qu'il provient d'une base voisine récemment détruite. Placé dans le chenil, le chien provoque la panique des autres animaux...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Loup de Wall Street", "2013-12-25", "film", " comedie policier", "https://image.tmdb.org/t/p/w500/dQIQZbJXn1pflQw3nwvXLJX0dHa.jpg", "L'histoire vraie de Jordan Belfort, un courtier en bourse qui passa vingt mois en prison pour avoir refusé de participer à une gigantesque arnaque, dévoilant la corruption et l'implication de la pègre qui sévit à Wall Street et au-delà des États-Unis. L’argent. Le pouvoir. Les femmes. La drogue. Les tentations étaient là, à portée de main, et les autorités n’avaient aucune prise. Aux yeux de Jordan et de sa meute, la modestie était devenue complètement inutile. Trop n’était jamais assez…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Source", "1960-02-08", "film", " policier", "https://image.tmdb.org/t/p/w500/zFDtirgBArEMNNhIUJvYA7k2tzn.jpg", "Au XVIe siècle, en Suède. Karin, la fille de Töre, un riche paysan, va porter des cierges à l'église en compagnie de sa sœur adoptive Ingeri. A la lisière de la forêt, les deux jeune filles se séparent. Karin continue son chemin et rencontre trois bergers. Elle leur propose de partager son repas. Mais ils se jettent sur Karin, la violent et l'assassinent, sous les yeux d'Ingeri qui cachée a assisté à la scène.  Les bergers ramassent les affaires de la morte et s'enfuient. Le soir, ils demandent asile dans une ferme sans savoir qu'il s'agit de celle des parents de leur victime, très inquiets de ne pas la voir revenir. Après le repas, l'aîné veut vendre la robe de Karin à la maîtresse des lieux qui reconnaît aussitôt les vêtements de sa fille. Mais celle-ci feint d'accepter le marché. Elle informe immédiatement son mari qui décide de se venger. En chemin, il croise Ingeri qui lui raconte tout. À l'aube, armé de son poignard, Töre tue les trois bergers...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Trainspotting", "1996-02-23", "film", " policier", "https://image.tmdb.org/t/p/w500/keN3IXpifzHBYHJfIBB4Z2x5uYM.jpg", "Les aventures tragi-comiques de Mark Renton, junkie d'Edimbourg, qui va tenter de se séparer de sa bande de copains, losers, menteurs, psychopathes et voleurs.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Château dans le ciel", "1986-08-02", "film", " action", "https://image.tmdb.org/t/p/w500/rp6hLzZLdQRHPOja44PebzstH47.jpg", "Sheeta, seule héritière des secrets de Laputa, la cité volante, attire l'avidité des pirates et de l'armée. Poursuivie, elle est sauvée par Pazu, un jeune pilote d'avion travaillant dans une cité minière.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Batman : The Dark Knight Returns, Part 2", "2013-01-18", "film", " action", "https://image.tmdb.org/t/p/w500/t1v3w57IIu80Ug3haDJu82V4Cdw.jpg", "Motivé par le retour de Batman, le Joker s'évade et provoque des meurtres en série. Superman demande à Batman de cesser ses activités avant qu'il ne soit obligé de l'arrêter par la force.…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Ruée vers l'or", "1925-06-25", "film", " comedie", "https://image.tmdb.org/t/p/w500/7XDbih6tqAfNulFCVxgARUUNHph.jpg", "Le célèbre assaut pour tout l'or de l'Oklahoma vu par l'un des maîtres du burlesque américain.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Perfect Strangers", "2016-02-11", "film", " comedie", "https://image.tmdb.org/t/p/w500/rnh4EPO0EQBRYlsZrcQUsDfVEr6.jpg", "Chacun de nous a trois vies : une vie publique, une vie privée et une vie secrète. Il fut un temps où notre vie secrète était bien protégée, archivée dans notre mémoire. À présent, elle est dans notre carte SIM, mais qu'arriverait-il si cette dernière se mettait à parler ?", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Non ci resta che piangere", "1984-12-20", "film", " comedie", "https://image.tmdb.org/t/p/w500/taKGG3hmRzn1TmC8fpvL9JU5SDV.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Chinatown", "1974-06-20", "film", " policier", "https://image.tmdb.org/t/p/w500/iZQSbGtE9qJGRt4OUuUUrwMVqEu.jpg", "Gittes, détective privé, reçoit la visite d'une fausse Mme Mulwray, qui lui demande de filer son mari, ingénieur des eaux à Los Angeles. Celui-ci est retrouvé mort, noyé. Gittes s'obstine dans son enquête, malgré les menaces de tueurs professionnels.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Autopsie d'un meurtre", "1959-07-01", "film", " policier", "https://image.tmdb.org/t/p/w500/5980Mt2gO9BlmfLmLYCYbuXlqAW.jpg", "L'avocat Paul Biegler reçoit un coup de téléphone de Laura Manion lui demandant d'assurer la défense de son mari. Le lieutenant Frederik Manion a tué un propriétaire de bar qui avait violé sa femme. Biegler accepte de le défendre. Le procès commence et la vérité a du mal à émerger, d'ailleurs les avocats et les juges, s'affrontant dans des batailles juridiques, en sont en réalité peu soucieux.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Ghost in the Shell", "1995-11-18", "film", " horreur action", "https://image.tmdb.org/t/p/w500/9gC88zYUBARRSThcG93MvW14sqx.jpg", "Dans un Japon futuriste régi par l'Internet, le major Motoko Kusunagi, une femme cyborg ultra-perfectionnée, est hantée par des interrogations ontologiques. Elle appartient, malgré elle, à une cyber-police musclée dotée de moyens quasi-illimités pour lutter contre le crime informatique. Le jour où sa section retrouve la trace du 'Puppet Master', un hacker mystérieux et légendaire dont l'identité reste totalement inconnue, la jeune femme se met en tète de pénétrer le corps de celui-ci et d'en analyser le ghost (élément indéfinissable de la conscience, apparenté à l'âme) dans l'espoir d'y trouver les réponses à ses propres questions existentielles...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Facteur", "1994-09-22", "film", " comedie", "https://image.tmdb.org/t/p/w500/2pIAXxCzZEVr624SY7I8ZxKRAgw.jpg", "Mario a eu l'infortune de naître sur une île du sud de l'Italie qui ne vit que de la pêche et de détester cette activité. Aussi, grande est sa joie lorsqu'il apprend qu'il est engagé comme facteur dans le village voisin et qu'en outre son travail se limitera à desservir une seule adresse, mais quelle adresse : celle de Pablo Neruda, le poète chilien en exil. Neruda se laisse peu à peu séduire par cet admirateur enthousiaste qu'il trouvait envahissant aux débuts de leur relation. Une amitié naît entre les deux hommes. Neruda communique à l'homme qui concrétise son lien avec le monde l'amour des mots et le sens de leur agencement. Il l'aide même à conquérir la femme qu'il aime et qu'il pourra bientôt épouser...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Enfants du ciel", "1997-08-01", "film", " comedie", "https://image.tmdb.org/t/p/w500/ik83L4ap4gYzlzGMsm2UqlIlsNe.jpg", "Ali est un garçon de neuf ans qui habite avec sa famille dans un quartier pauvre de Tehran, en Iran. Un jour, il va faire réparer les chaussures de sa petite sœur Zahra chez le cordonnier, mais perd le paquet sur le chemin du retour. Rentré à la maison, il n'ose rien dire à ses parents, qui sont pauvres et ont à peine assez d'argent pour payer le loyer. Sa sœur consent à garder le secret, mais refuse d'aller en pantoufle à l'école. Ils décident alors de partager la paire de baskets d'Ali pour aller à l'école. Zahra la porte le matin et Ali l'après-midi.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Frankenstein Junior", "1974-12-15", "film", " horreur comedie", "https://image.tmdb.org/t/p/w500/d1pdL3ubsQ96fgQqK0hPiifDfYR.jpg", "Peu fier de son ascendance, le Docteur Frederick Frankenstein accepte pourtant de retourner sur les terres de ses ancêtres. Rattrapé par la folie familiale, il décide de suivre les traces de son aïeul et de créer à son tour une créature à partir de cadavres, avec l'aide de son fidèle serviteur Igor. Malheureusement, chargé de trouver le cerveau d'une génie, ce dernier se trompe et rapporte à Frankenstein un cerveau anormal...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mary", "2017-04-12", "film", " comedie", "https://image.tmdb.org/t/p/w500/o8ORdhjSF1wIj67K2kmH9Y9kiah.jpg", "Un homme se bat pour obtenir la garde de sa nièce, qui témoigne d'un don hors du commun pour les mathématiques.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Le Fabuleux Destin d'Amélie Poulain", "2001-04-25", "film", " comedie", "https://image.tmdb.org/t/p/w500/tDOzV7CeC1PplhmNTxbTq4uCxt6.jpg", "Amélie, une jeune serveuse dans un bar de Montmartre, passe son temps à observer les gens et à laisser son imagination divaguer. Elle s'est fixé un but : faire le bien de ceux qui l'entourent. Elle invente alors des stratagèmes pour intervenir incognito dans leur existence.Le chemin d'Amélie est jalonné de rencontres : Georgette, la buraliste hypocondriaque ; Lucien, le commis d'épicerie ; Madeleine Wallace, la concierge portée sur le porto et les chiens empaillés ; Raymond Dufayel alias l'homme de verre, son voisin qui ne vit qu'à travers une reproduction d'un tableau de Renoir.Cette quête du bonheur amène Amélie à faire la connaissance de Nino Quincampoix, un étrange prince charmant. Celui-ci partage son temps entre un train fantôme et un sex-shop, et cherche à identifier un inconnu dont la photo réapparaît sans cesse dans plusieurs cabines de Photomaton.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Gardiens de la Galaxie", "2014-07-30", "film", " horreur action", "https://image.tmdb.org/t/p/w500/dNjU7iyH8X5FmTYNYiC9DwqlsiS.jpg", "Peter Quill est un aventurier traqué par tous les chasseurs de primes pour avoir volé un mystérieux globe convoité par le puissant Ronan, dont les agissements menacent l’univers tout entier. Lorsqu’il découvre le véritable pouvoir de ce globe et la menace qui pèse sur la galaxie, il conclut une alliance fragile avec quatre aliens disparates : Rocket, un raton laveur fin tireur, Groot, un humanoïde semblable à un arbre, l’énigmatique et mortelle Gamora, et Drax le Destructeur, qui ne rêve que de vengeance. En les ralliant à sa cause, il les convainc de livrer un ultime combat aussi désespéré soit-il pour sauver ce qui peut encore l’être…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dogman", "2018-05-17", "film", " policier", "https://image.tmdb.org/t/p/w500/xzCkOIvxgVTsE9EbRW9mojN4MYP.jpg", "Dans une banlieue déshéritée, Marcello, toiletteur pour chiens discret et apprécié de tous, voit revenir de prison son ami Simoncino, un ancien boxeur accro à la cocaïne qui, très vite, rackette et brutalise le quartier. D’abord confiant, Marcello se laisse entraîner malgré lui dans une spirale criminelle. Il fait alors l’apprentissage de la trahison et de l’abandon, avant d’imaginer une vengeance féroce...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Pride", "2014-09-12", "film", " comedie", "https://image.tmdb.org/t/p/w500/qyUykCzWq1qIdg5QOhRehmT2Wfb.jpg", "Eté 1984 - Margaret Thatcher est au pouvoir et l’Union Nationale des Mineurs est en grève. Lors de la Gay Pride à Londres, un groupe d’activistes gay et lesbien décide de récolter de l’argent pour venir en aide aux familles des mineurs en grève.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Fantozzi", "1975-03-27", "film", " comedie", "https://image.tmdb.org/t/p/w500/oHqHe0MNqcbmw5Qa3075KIzE4G7.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Vacances romaines", "1953-08-26", "film", " comedie", "https://image.tmdb.org/t/p/w500/qv22qLKKCJM6UdVVWOU6k0PcAx4.jpg", "Les tendres amours, le temps d'une journée, d'une princesse fugueuse et d'un séduisant journaliste américain, dans la Ville éternelle, Rome.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Grande vadrouille", "1966-12-07", "film", " comedie", "https://image.tmdb.org/t/p/w500/kXBawoZ7QsNV7rt4IZEks3dYxOU.jpg", "En 1942, un avion anglais est abattu par les Allemands au-dessus de Paris. Les trois pilotes sautent en parachute et atterrissent dans différents endroits de la capitale. Ils sont aidés par deux civils français, un chef d'orchestre et un peintre en bâtiment qui acceptent de les mener en zone libre; ils deviennent ainsi, malgré eux, acteurs de la Résistance.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "बजरंगी भाईजान", "2015-07-17", "film", " action comedie", "https://image.tmdb.org/t/p/w500/fAVCr7rfEKbQzre4ETCFXNDV6U3.jpg", "Munni, une petite fille de 6 ans, pakistanaise, muette, est désespérément à la recherche de sa mère perdue lors d'un voyage en Inde. Sa rencontre avec Pawan Kumarum (Salman Khan), un homme généreux, va lui redonner espoir. Leur incroyable voyage plein de dangers et de belles rencontres sera porteur d'humanité.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Kill Bill : Volume 1", "2003-10-10", "film", " action policier", "https://image.tmdb.org/t/p/w500/wHc7Kb66icpaKLrrBcTnaxa5B3n.jpg", "Au cours d'une cérémonie de mariage en plein désert, un commando fait irruption dans la chapelle et tire sur les convives. Laissée pour morte, la Mariée enceinte retrouve ses esprits après un coma de quatre ans. Celle qui a auparavant exercé les fonctions de tueuse à gages au sein du Détachement International des Vipères Assassines n'a alors plus qu'une seule idée en tête : venger la mort de ses proches en éliminant tous les membres de l'organisation criminelle, dont leur chef Bill qu'elle se réserve pour la fin.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'Île aux chiens", "2018-03-23", "film", " comedie", "https://image.tmdb.org/t/p/w500/i6PeSvCdpFnbWYi0M4BfyHMG0YG.jpg", "Lorsqu’une épidémie de grippe canine envahit la ville japonaise de Megasaki et menace de contaminer les hommes, le maire ordonne la mise en quarantaine de tous les chiens. L’île poubelle devient : l’Île aux Chiens. Un jeune garçon de 12 ans, Atari, se rend sur place à la recherche de son chien perdu, Spots. C’est alors qu’il fait la découverte,  à l’aide d’une meute de cinq chiens, d’une conspiration qui menace la ville.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Kill Bill: The Whole Bloody Affair", "2011-03-28", "film", " action policier", "https://image.tmdb.org/t/p/w500/cMmicZ9yi69pctF5byT6QZMrmj.jpg", "Kill Bill : The Whole Bloody Affair est une édition complète des deux films d'action d'arts martiaux Kill Bill : Volume 1 et Kill Bill : Volume 2. Le film était à l'origine prévu pour être publié comme une partie. Toutefois, en raison de la durée du film plus de 4 heures, il a été divisé en deux parties.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Toy Story", "1995-10-30", "film", " comedie", "https://image.tmdb.org/t/p/w500/5NQHcS7qrhtK6ZL7pql7qyikh4p.jpg", "Quand le jeune Andy quitte sa chambre, ses jouets se mettent à mener leur propre vie sous la houlette de son pantin préféré, Woody le cow-boy. Andy ignore également que chaque anniversaire est une source d'angoisse pour ses jouets qui paniquent à l'idée d'être supplantés par un nouveau venu. Ce qui arrive quand Buzz l'éclair est offert à Andy. Cet intrépide aventurier de l'espace, venu d'une lointaine galaxie, va semer la zizanie dans ce petit monde et vivre avec Woody d'innombrables aventures aussi dangereuses que palpitantes.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La La Land", "2016-11-29", "film", " comedie", "https://image.tmdb.org/t/p/w500/5KIj6aioW1UtUT1IV0qqW5iZbNH.jpg", "Au cœur de Los Angeles, une actrice en devenir prénommée Mia sert des cafés entre deux auditions. De son côté, Sebastian, passionné de jazz, joue du piano dans des clubs miteux pour assurer sa subsistance. Tous deux sont bien loin de la vie rêvée à laquelle ils aspirent…  Le destin va réunir ces doux rêveurs, mais leur coup de foudre résistera-t-il aux tentations, aux déceptions, et à la vie trépidante d’Hollywood ?", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Kagemusha, l'ombre du guerrier", "1980-04-26", "film", " action", "https://image.tmdb.org/t/p/w500/f8vVqRUMZPHKRFol0VKK4c8iEZD.jpg", "En 1573, le Japon est le théâtre de guerres incessantes entre clans rivaux. Le plus puissant de ces clans est commandé par Shingen Takeda. Au cours du siège du château de Noda, Takeda est blessé à mort par un tireur embusqué. Pour éviter que son clan perde de sa cohésion dans des luttes intestines, Shingen demande que sa mort reste cachée pendant trois ans. Un ancien voleur, épargné pour sa ressemblance avec le seigneur de la guerre, fait alors office de doublure avec la complicité des généraux, afin de duper leurs nombreux ennemis à l'affût.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Trois idiots", "2009-12-23", "film", " comedie", "https://image.tmdb.org/t/p/w500/wbE5SRTZFtQxgj2nIo4HJpQDk0k.jpg", "Deux amis, Raju et Farhan, se mettent à la recherche d'un copain qu'ils n'ont pas revu depuis leur jeunesse. En chemin, ils honorent un pari fait de nombreuses années auparavant et oublié depuis : ils doivent participer à une noce en resquilleurs. Ils assistent aussi à des funérailles où la situation dérape et échappe à tout contrôle. Simultanément, ils entament un voyage intérieur à travers leurs souvenirs et l'histoire de leur ami Rancho, un libre penseur qui à sa façon a su toucher leur âme et leur a appris à penser par eux-mêmes, changeant leurs vies à tout jamais. Étudiants en ce temps-là, leurs vies oscillent entre la relation passionnelle qui lie Rancho à Pia, jeune fille au tempérament ardent, et les affrontements opposant leur ami au professeur Viru Sahastrabuddhe, très imbu de lui même. Puis un jour, Rancho disparaît, les laissant dans le doute : qui est-il, d'où vient-il et surtout, pourquoi les a-t-il abandonnés ?", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dancer in the Dark", "2000-05-17", "film", " policier", "https://image.tmdb.org/t/p/w500/7xizDTz4Yj4IYm2ud4f6EfEXe5H.jpg", "Selma Jezkova, emigrée tchèque et mère célibataire, travaille dans une usine de l'Amérique profonde. Elle trouve son salut dans sa passion pour la musique, spécialement les chansons et les danses des grandes comédies musicales hollywoodiennes. Selma garde un lourd secret : elle perd la vue et son fils Gene connaîtra le même sort sauf si elle réussit à mettre assez d'argent de côté pour lui payer une opération. Quand un voisin aux abois accuse a tort Selma d'avoir volé ses économies, le drame de sa vie s'intensifie pour se terminer en final tragique.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Big Lebowski", "1998-03-06", "film", " comedie policier", "https://image.tmdb.org/t/p/w500/6e0csi4GUsYlptvSeRXH10YWSrN.jpg", "Jeff Lebowski, prénommé le Duc, est un paresseux qui passe son temps à boire des coups avec son copain Walter et à jouer au bowling, jeu dont il est fanatique. Un jour deux malfrats le passent à tabac. Il semblerait qu'un certain Jackie Treehorn veuille récupérer une somme d'argent que lui doit la femme de Jeff. Seulement Lebowski n'est pas marié. C'est une méprise, le Lebowski recherché est un millionnaire de Pasadena. Le Duc part alors en quête d'un dédommagement auprès de son richissime homonyme...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Locataires", "2004-10-15", "film", " policier", "https://image.tmdb.org/t/p/w500/o7vylE4z5aM4jQUolN4mJHJSf5C.jpg", "Tae-suk arpente les rues à moto. Il laisse des prospectus sur les poignées de porte des maisons. Quand il revient quelques jours après, il sait ainsi lesquelles sont désertées. Il y pénètre alors, occupe ces lieux inhabités, sans jamais rien y voler. Il va même jusqu'à laver le linge, réparer les objets cassés qui l'entourent.Un jour, il s'installe dans une maison aisée où habite Sun-houa, une femme maltraitée par son mari. Dès qu'il découvre sa présence, il quitte les lieux. Pourtant, ne pouvant l'oublier, il revient sur ses pas pour l'emmener avec lui. Dès lors, d'appartements en villas, de demeures en maisons, le couple partage en silence la solitude qui les unit. Alors que tout le monde cherche à les séparer, un étrange lien aussi puissant qu'invisible semble les confondre.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Terminator 2 : Le Jugement dernier", "1991-07-03", "film", " horreur action", "https://image.tmdb.org/t/p/w500/mRtFOHF93zW4kTp4JOYrH71vxBh.jpg", "En 2029, après leur échec pour éliminer Sarah Connor, les robots de Skynet programment un nouveau Terminator, le T-1000, pour retourner dans le passé et éliminer son fils John Connor, futur leader de la résistance humaine. Ce dernier programme un autre cyborg, le T-800, en l'envoie également en 1995, pour le protéger. Une seule question déterminera le sort de l'humanité : laquelle des deux machines trouvera John la première ?", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Barbe à papa", "1973-05-09", "film", " comedie policier", "https://image.tmdb.org/t/p/w500/qAGbNZmrnrrXxpxOUWdV6wRNpgX.jpg", "Kansas, dans les années 30, Moses Pray, escroc à la petite semaine, assiste à l’enterrement d’une ex-maîtresse et accepte d’emmener sa prétendue fille de 9 ans, Addie, chez une tante. Pendant leur trajet, leurs rapports sont tendus. L’orpheline est persuadée que celui-ci est son père, en raison de la ressemblance de leur menton mais Moses refuse d’endosser ce rôle. Étonnamment mûre pour son âge, la petite Addie s’avère être une coéquipière très efficace : c’est le début de leur épopée.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Là-haut", "2009-05-28", "film", " comedie", "https://image.tmdb.org/t/p/w500/fhPsHld7wU1JlgnTZTFBVuF0Dq6.jpg", "A 78 ans, Carl n'envisage plus qu'une chose : finir tranquillement sa vie dans la petite maison où il a passé toute une existence paisible auprès de son épouse Ellie. Veuf désormais, il reste, en effet, attaché à son passé en refusant les propositions mirobolantes d'un promoteur pour racheter son bien. Quand des circonstances exceptionnelles le contraignent d'intégrer une maison de retraite, il prend une ultime fois les choses en mains et, transformant sa demeure en dirigeable, s'envole pour l'aventure, vers la partie du monde où sa femme et lui s'étaient promis un jour de s'installer.  Il ne se doute pas alors qu'il a emporté avec lui un jeune passager clandestin, Russell et que le voyage sera loin d'être de tout repos...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mauvaise graine", "2015-09-08", "film", " policier", "https://image.tmdb.org/t/p/w500/dnMcD7tYJK7mfNKCd3RciXS2R45.jpg", "1995, près de Rome. Vittorio et Cesare qui se connaissent depuis 20 ans, sont  comme des frères inséparables. Leur quotidien se résume aux discothèques, à  l’alcool et aux trafics de drogues… Mais ils paient cher cette vie d’excès. Après  avoir rencontré Linda, Vittorio semble vouloir changer de vie. Cesare lui, plonge  inexorablement…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Il marchese del Grillo", "1981-12-22", "film", " comedie", "https://image.tmdb.org/t/p/w500/xcKMFggToWY9ccsMNKh0xwnqfDq.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Règlement de comptes", "1953-10-14", "film", " policier", "https://image.tmdb.org/t/p/w500/mjsQbg09WRpXnsQxAKlZC1QGOKN.jpg", "Le policier Tom Duncan se suicide en laissant une lettre où il révèle la corruption de l'administration de la ville qui est sous la coupe du gangster Mike Lagana. Dave Bannion pense qu'il y a une autre raison au suicide de son collègue. Ses soupçons sont confirmés lorsque Lucy Chapman, une entraîneuse, lui apprend qu'il était en parfaite santé et décidé à divorcer pour elle. Le lendemain, Dave reçoit l'ordre d'abandonner l'enquête, mais ne s'y résout pas...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "No Country For Old Men", "2007-11-08", "film", " policier", "https://image.tmdb.org/t/p/w500/gvljy21vEELenGZOttB5VlqHIhT.jpg", "A la frontière qui sépare le Texas du Mexique, les trafiquants de drogue ont depuis longtemps remplacé les voleurs de bétail. Lorsque Llewelyn Moss tombe sur une camionnette abandonnée, cernée de cadavres ensanglantés, il ne sait rien de ce qui a conduit à ce drame. Et quand il prend les deux millions de dollars qu'il découvre à l'intérieur du véhicule, il n'a pas la moindre idée de ce que cela va provoquer... Moss a déclenché une réaction en chaîne d'une violence inouïe que le shérif Bell, un homme vieillissant et sans illusions, ne parviendra pas à contenir...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Jeux Dangereux", "1942-03-05", "film", " comedie", "https://image.tmdb.org/t/p/w500/8dOPc2gRIFqlYJvAagrAlK7jKiq.jpg", "Durant la Deuxième Guerre mondiale, entre Varsovie et Londres, une troupe de comédiens parvient à déjouer un plan de la Gestapo...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "V pour vendetta", "2006-03-15", "film", " action", "https://image.tmdb.org/t/p/w500/A7HFfECsUF2oXSq6BznuhzXWMMO.jpg", "Londres, au 21ème siècle... Evey Hammond ne veut rien oublier de l'homme qui lui sauva la vie et lui permit de dominer ses peurs les plus lointaines. Mais il fut un temps où elle n'aspirait qu'à l'anonymat pour échapper à une police secrète omnipotente. Comme tous ses concitoyens, trop vite soumis, elle acceptait que son pays ait perdu son âme et se soit donné en masse au tyran Sutler et à ses partisans. Une nuit, alors que deux gardiens de l'ordre s'apprêtaient à la violer dans une rue déserte, Evey vit surgir son libérateur. Et rien ne fut plus comme avant. Son apprentissage commença quelques semaines plus tard sous la tutelle de V. Evey ne connaîtrait jamais son nom et son passé, ne verrait jamais son visage atrocement brûlé et défiguré, mais elle deviendrait à la fois son unique disciple, sa seule amie et le seul amour d'une vie sans amour...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Stand by Me", "1986-08-08", "film", " policier", "https://image.tmdb.org/t/p/w500/bUvHHEWqN2KDBUf7bRz1UFczxEP.jpg", "Un événement peu ordinaire va marquer la vie du jeune Gordie Lachance. Au cours de l’été 1959, un adolescent a disparu mystérieusement dans l'Oregon. Gordie et ses inséparables copains, Chris, Teddy et Vern savent qu'il est mort pour avoir approche de trop prés la voie ferree, un train l'a heurte. Son corps git au fond des bois. C'est le frere de Vern qui l'a découvert. Les enfants décident de s'attribuer le scoop et partent pour la grande foret de Castle Rock. Cette aventure va rester pour Gordie et ses trois amis la plus étrange et la plus exaltante de leur vie.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Victoria", "2015-06-11", "film", " policier", "https://image.tmdb.org/t/p/w500/feNYDIk9zrB0CGOPHVmXBPNaNWW.jpg", "5h42. Berlin. Sortie de boîte de nuit, Victoria, espagnole fraîchement débarquée, rencontre Sonne et son groupe de potes. Emportée par la fête et l'alcool, elle décide de les suivre dans leur virée nocturne. Elle réalise soudain que la soirée est en train de sérieusement déraper…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Arnaques, crimes et botanique", "1998-03-05", "film", " comedie policier", "https://image.tmdb.org/t/p/w500/Adxlut4a8DJIVqskA0IUqL2BPy6.jpg", "Eddy, un joueur invétéré, s'apprête à participer à la plus grosse partie de cartes de sa vie avec un enjeu de cent mille livres, somme qu'il a durement amassée avec ses trois acolytes, Tom, Baco et Soap. Eddy est considéré comme l'un des meilleurs joueurs du circuit, mais la partie s'avère être un coup monté à l'issue duquel il doit cinq cent mille livres à son adversaire Hatchet Harry. Ce dernier lui donne une semaine pour réunir cette somme, sinon il aura les doigts coupés. Seul JD, le père d'Eddy, pourrait annuler la dette en cédant son bar à son vieux rival, Harry.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La règle du jeu", "1939-06-08", "film", " comedie", "https://image.tmdb.org/t/p/w500/wXQQ28YCuTfyuCE7BIneCieQ2m.jpg", "Le film de Jean Renoir est à la fois empreint de légèreté et profondément pessimiste, comme un mélancolique et prophétique jeu de massacre que l'amour et l'amitié sont impuissants à enrayer. S'appuyant sur la longue tradition théâtrale française et la comédie de mœurs, grâce aux meilleurs acteurs de son temps (Dalio, Carette ou Paulette Dubost en tête, sans oublier sa propre prestation pleine de tendresse), le cinéaste jette un regard caustique sur la bourgeoisie et la société française. Œuvre complexe, à plusieurs niveaux de lecture, où se mêlent farce, romance, drame et tragédie, La règle du jeu déconcerte et révolte les spectateurs de l'époque. La presse de droite ne manque pas d'attaquer le cinéaste, cible de choix pour son engagement résolu en faveur du Front populaire. Jugé démoralisant, le film sera même interdit par le gouvernement peu après l'entrée en guerre.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Best Offer", "2013-01-01", "film", " policier", "https://image.tmdb.org/t/p/w500/kvQnNNFkjSw1BDjPXqKtzWgDrj2.jpg", "Virgil Oldman est un monde d'antiquités célèbre expert et commissaire-priseur. Un génie excentrique, il mène une vie solitaire, aller à l'extrême pour garder ses distances avec le désordre des relations humaines. Lors de sa nomination par le beau mais émotionnellement endommagé Claire pour superviser l'évaluation et la vente de la collection d'art inestimable de sa famille, Virgile se permet de former un attachement pour elle - et bientôt il est englouti par une passion qui fera vibrer son existence", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Voyages de Sullivan", "1941-11-30", "film", " comedie", "https://image.tmdb.org/t/p/w500/MDZ0PrhCgOip1g19OnhFrCTJ27.jpg", "Lassé des frasques d'Hollywood, John L. Sullivan, jusque-là réalisateur de comédies, décide de tourner un film qu'il veut plus dramatique et ancré dans la réalité. Vêtu tel un vagabond, il commence ses voyages pour mieux comprendre les aspirations des milieux défavorisés.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Arrête-moi si tu peux", "2002-12-25", "film", " policier", "https://image.tmdb.org/t/p/w500/qMKVkpI2q7bFLL10Zczv8xZH7np.jpg", "Dans les années soixante, le jeune Frank Abagnale Jr. est passé maître dans l'art de l'escroquerie, allant jusqu'à détourner 2,5 millions de dollars et à figurer sur les listes du FBI comme l'un des dix individus les plus recherchés des Etats-Unis. Véritable caméléon, Frank revêt des identités aussi diverses que celles de pilote de ligne, de médecin, de professeur d'université ou encore d'assistant du procureur. Carl Hanratty, agent du FBI à l'apparence stricte, fait de la traque de Frank Abagnale Jr. sa mission prioritaire, mais ce dernier reste pendant longtemps insaisissable...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Il était temps", "2013-08-16", "film", " horreur comedie", "https://image.tmdb.org/t/p/w500/eoOvm8cUtjxmfHX6i6a3maEhjCj.jpg", "À 21 ans révolus, Tim Lake découvre qu'il a le pouvoir de voyager dans le temps... Au lendemain d'un réveillon de jour de l'an encore décevant, le père de Tim révèle à son fils que tous les hommes de la famille ont, depuis toujours, la faculté de voyager dans le temps. Tim ne peut pas changer le cours de l'histoire mais il peut changer ce qui se passe et s'est passé dans sa vie. Il décide d'améliorer son existence... en se trouvant une petite amie.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Aliens, le retour", "1986-07-18", "film", " horreur action", "https://image.tmdb.org/t/p/w500/hCFMlY8C3tDsh173C8NhOpf0pEK.jpg", "Après 57 ans de dérive dans l'espace, Ellen Ripley est secourue par la corporation Weyland-Yutani. Malgré son rapport concernant l’incident survenu sur le Nostromo, elle n’est pas prise au sérieux par les militaires quant à la présence de xénomorphes sur la planète LV-426 où se posa son équipage… planète où plusieurs familles de colons ont été envoyés en mission de terraformage. Après la disparition de ces derniers, Ripley décide d'accompagner une escouade de marines dans leur mission de sauvetage... et d’affronter à nouveau la Bête.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Aventuriers de l'arche perdue", "1981-06-12", "film", " action", "https://image.tmdb.org/t/p/w500/4fSlleLcmU2DJcibJugh2lLk6Fh.jpg", "1936. Parti à la recherche d'une idole sacrée en pleine jungle péruvienne, l'aventurier Indiana Jones échappe de justesse à une embuscade tendue par son plus coriace adversaire : le Français René Belloq. Revenu à la vie civile à son poste de professeur universitaire d'archéologie, il est mandaté par les services secrets et par son ami Marcus Brody, conservateur du National Museum de Washington, pour mettre la main sur le Médaillon de Râ, en possession de son ancienne amante Marion Ravenwood, désormais tenancière d'un bar au Tibet. Cet artefact égyptien serait en effet un premier pas sur le chemin de l'Arche d'Alliance, celle-là même où Moïse conserva les Dix Commandements. Une pièce historique aux pouvoir inimaginables dont Hitler cherche à s'emparer.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Frissons de l'angoisse", "1975-03-07", "film", "", "https://image.tmdb.org/t/p/w500/2xKVkSIvq2W5iVf8Nn4ZbNQBYv1.jpg", "Une conférencière télépathe est sauvagement assassinée. Peu avant sa mort, elle avait ressentie une présence meurtrière très proche. C'est le début d'une série de crimes inexpliquables.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Minha Mãe é uma Peça", "2013-06-21", "film", " comedie", "https://image.tmdb.org/t/p/w500/23OQ3DUcDohNibPWcx8xpLRZW0b.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'Impasse", "1993-11-10", "film", " policier", "https://image.tmdb.org/t/p/w500/4eTlACGm6yKOz97NAQWtjOk9Bdt.jpg", "En 1975, à New York, Carlito Brigante, un ancien trafiquant de drogue, est libéré de prison grâce à David Kleinfeld, son avocat, qui a découvert plusieurs vices de forme dans la manière dont le procureur Bill Norwalk avait instruit le procès. Carlito est bien décidé à rentrer dans le droit chemin et, dès qu'il aura économisé assez d'argent, il compte se retirer aux Bahamas pour s'assurer une retraite paisible avec Gail, sa compagne danseuse dans une boîte de strip-tease. Mais le destin en décidera autrement.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Rendez-vous", "1940-01-11", "film", " comedie", "https://image.tmdb.org/t/p/w500/uSl89ZQE5Zi1jYEfwwzFWRtN7Ka.jpg", "Chez Matuschek et Cie, une grande boutique de maroquinerie, le jeune Alfred Kralik, l'adjoint du patron, et Klara Novak, une nouvelle employée, vont échanger une correspondance amoureuse, sans savoir qui ils sont, à l'aide de petites annonces.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Braveheart", "1995-05-24", "film", " action", "https://image.tmdb.org/t/p/w500/a4mfkzUDbZk4jV6EapQGGf7uzxE.jpg", "Évocation de la vie tumultueuse de William Wallace, héros et symbole de l'indépendance écossaise, qui à la fin du XIIIe siècle affronta les troupes du roi d'Angleterre Edward I qui venaient d'envahir son pays.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Amarcord", "1973-12-13", "film", " comedie", "https://image.tmdb.org/t/p/w500/d4MC1rYwcGihxadxIf60dD3WeGS.jpg", "Dans un bourg italien près de la mer, à l'heure du fascisme triomphant, les enfants trainassent, cherchant des victimes pour leurs blagues innocentes. L'un d'eux va connaître, en l'espace d'une année, une série d'expériences tour à tour drôles, savoureuses et poignantes.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Fargo", "1996-03-08", "film", " policier", "https://image.tmdb.org/t/p/w500/cRBHXnxXO2LiPxstGBnE0tbJQjn.jpg", "Quelque part dans le Minnesota, en plein hiver. Jerry Lundegaard, un minable vendeur de voitures, contacte un petit escroc, Carl Showalter, et son inquiétant compère, Grimsrud. Il leur demande d'enlever sa femme, Jean, dont le père, Wade, un richissime homme d'affaires, ne manquera pas de régler la rançon exigée. Les deux truands s'empêtrent quelque peu dans les péripéties mais finissent par réussir leur affaire. Grimsrud commence alors à donner la mesure de ses talents. Il tue de sang-froid un policier lors d'un banal contrôle de routine, puis les deux témoins du meurtre. Marge Gunderson, une femme policier, enceinte, est chargée de l'enquête. Pendant ce temps, Jerry apprend avec déplaisir que son beau-père entend conduire lui-même les négociations avec les preneurs d'otage...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "I Am Not an Animal", "2004-05-10", "serie", " comedie", "https://image.tmdb.org/t/p/w500/nMhv6jG5dtLdW7rgguYWvpbk0YN.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Rick et Morty", "2013-12-02", "serie", " horreur action comedie", "https://image.tmdb.org/t/p/w500/7SzW3al4H2kr9eLvENpcLMzgUvm.jpg", "Rick est un scientifique âgé et déséquilibré qui a récemment renoué avec sa famille. Il passe le plus clair de son temps à entraîner son petit-fils Morty dans des aventures extraordinaires et dangereuses, à travers l'espace et dans des univers parallèles. Ajoutés à la vie de famille déjà instable de Morty, ces événements n'amènent qu'un surcroît de stress pour Morty, à la maison et au collège.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Stranger Things", "2016-07-15", "serie", " horreur", "https://image.tmdb.org/t/p/w500/esKFbCWAGyUUNshT5HE5BIpvbcL.jpg", "Quand un jeune garçon disparaît, une petite ville découvre une affaire mystérieuse, des expériences secrètes, des forces surnaturelles terrifiantes... et une fillette.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Fullmetal Alchemist: Brotherhood", "2009-04-05", "serie", " action", "https://image.tmdb.org/t/p/w500/4CapuGYNdLTZ0zopFq9y1xQL0qE.jpg", "L'Alchimie existe pour permettre aux hommes d'améliorer leur quotidien. Pour pouvoir l'utiliser, ils doivent comprendre un principe fondamental : pour chaque chose créée, il faut en sacrifier une autre. C'est le principe de l'Échange Équivalent. Edward et Alphonse Elric l'ont appris à leurs dépends. Pour retrouver ce qu'ils ont perdu, les deux jeunes frères s'engagent dans l'armée d'Amestris, et à la solde du gouvernement, tentent de calmer les nombreux conflits à l'aide de leur alchimie. Leur quête de la Pierre Philosophale les mènera vers de nouveaux amis, vers un complot à l'échelle nationale, et vers une Vérité plus que terrifiante. Réussiront-ils à déjouer les plans de Father ? Et qui se cache derrière ce physique si familier ? Qu'avons-nous ici, entre les mains, est-ce l'Espérance ou le Désespoir ?", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Cowboy Bebop", "1998-04-03", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/tfwkOyY1jPioAKONcwcVatNVUO0.jpg", "Sur la planète Mars, en 2071, un camion-citerne explose dans le cratère d'Alba City. Aux dizaines de victimes tuées par l'explosion s'ajoutent des centaines de personnes qui succombent à une mystérieuse maladie. Les autorités soupçonnent une attaque biologique terroriste et offrent une énorme récompense pour la capture des responsables. Sans un sou en poche, les chasseurs de prime du Bebop voient là l'occasion de se renflouer et entament leur enquête. Une ombre entraperçue, une capsule de poison, un consortium pharmaceutique, un tatouage, un suspect mort depuis longtemps et une unité militaire spéciale, telles sont les pièces du puzzle qu'il leur faudra rassembler pour espérer percer le secret...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sur écoute", "2002-06-02", "serie", " policier", "https://image.tmdb.org/t/p/w500/zdV44C5fRWJweApMHh4K9yeEJB8.jpg", "Quand la police s'efforce de démanteler un réseau tentaculaire de trafic de drogue et du crime à Baltimore.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sherlock", "2010-07-25", "serie", " policier", "https://image.tmdb.org/t/p/w500/2gAQ4uOux0BItGN4aNd3DtuXEsG.jpg", "Les aventures modernisées du plus célèbre des enquêteurs : Sherlock Holmes et de son ami et assistant, le Dr Watson. Un remake vivant et drôle du classique de Arthur Conan Doyle revisité par Steven Moffat.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Fargo", "2014-04-15", "serie", " policier", "https://image.tmdb.org/t/p/w500/sskPK2HjkFaxam10eg0Hk1A3I2m.jpg", "Fargo est une série télévisée américaine d'anthologie créée par Noah Hawley. Elle est basée sur le film du même nom sorti en 1996, écrit et réalisé par les frères Joel et Ethan Coen, producteurs de la série.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Over the Garden Wall", "2014-11-03", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/2kcGFbt768xAiqvj748FFlO9Gvl.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Souvenirs de Gravity Falls", "2012-06-15", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/oGsgxjeZ9rd20eCJsGSMGgWvl4P.jpg", "Gravity Falls raconte les aventures des jumeaux Pines, Dipper le frère et Mabel sa sœur, âgés de 12 ans, dont les plans pour l'été sont anéantis lorsque leurs parents les envoient chez grand-tonton Stan à Gravity Falls.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Peaky Blinders", "2013-09-12", "serie", " policier", "https://image.tmdb.org/t/p/w500/AiqsuFFL2u4hsrMFYUbQlX9BqhH.jpg", "En 1919, à Birmingham, soldats, révolutionnaires politiques et criminels combattent pour se faire une place dans le paysage industriel de l'après-Guerre. Le Parlement s'attend à une violente révolte, et Winston Churchill mobilise des forces spéciales pour contenir les menaces. La famille Shelby compte parmi les membres les plus redoutables. Surnommés les Peaky Blinders par rapport à leur utilisation de lames de rasoir cachées dans leurs casquettes, ils tirent principalement leur argent de paris et de vol. Tommy Shelby, le plus dangereux de tous, va devoir faire face à l'arrivée de Campbell, un impitoyable chef de la police qui a pour mission de nettoyer la ville. Ne doit-il pas se méfier tout autant la ravissante Grace Burgess ? Fraîchement installée dans le voisinage, celle-ci semble cacher un mystérieux passé et un dangereux secret.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Firefly", "2002-09-20", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/78RxkgOhdl5aRtyCoNYKBJysnQD.jpg", "Après une guerre civile qui a permis à l'Union des Planètes de dominer l'espace, le capitaine Malcolm Reynolds et son équipage s'efforcent de survivre à bord du vaisseau Serenity en effectuant diverses missions (transport de marchandises ou une mission de sauvetage...) sans trop se soucier de la légalité.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Seinfeld", "1989-07-05", "serie", " comedie", "https://image.tmdb.org/t/p/w500/u3mFyqIprL5ou8Ue04Ecac6iDi7.jpg", "Dans son propre rôle de comique, le bavard Jerry Seinfeld mène une vie qui ne le gâte pas tout le temps, notamment à cause des femmes. Avec son collaborateur malhonnête et son voisin loufoque, Jerry analyse toutes les petites choses du quotidien et les absurdités de la société.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Star Trek : La Nouvelle Génération", "1987-09-28", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/8ZfPKg1xTahEigpDA53bRmmLdvs.jpg", "Cette série raconte les aventures, au XXIVe siècle, du vaisseau USS Enterprise (NCC-1701-D), commandé par un capitaine d'origine française, Jean-Luc Picard, et de son équipage.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Peep Show", "2003-09-19", "serie", " comedie", "https://image.tmdb.org/t/p/w500/pqrGyLYS5WIsLXwCuxc46sOP50F.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Black Mirror", "2011-12-04", "serie", " horreur", "https://image.tmdb.org/t/p/w500/vGrS1mzlSHQQdOcmqH1zlE2iViY.jpg", "L’intrigue se place dans un futur atemporel et peut être située dans différentes zones de Grande-Bretagne. Chacun des épisodes de cette série raconte une nouvelle histoire indépendante des autres, se déroulant dans un décor différent et avec à chaque fois un nouveau casting. Ils ont pourtant tous un point commun : chaque récit traite des nouvelles technologies et du sombre tournant que la société pourrait prendre par leur biais dans un futur plus ou moins proche. Une micro-puce qui enregistre l’ensemble de nos vies, des télé-crochets qui prennent des proportions démesurées, le terrorisme via les réseaux sociaux, l’ampleur du voyeurisme que ces derniers engendrent… Black Mirror nous met en garde sur les penchants pervers de notre société actuelle, dépendante de toutes sortes d’écrans et des technologies qui nous entourent. Le titre fait d’ailleurs référence à l’écran de nos smartphones, tout en suggérant qu’il s’agit là d’un reflet noir de notre société.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Frères d'armes", "2001-09-09", "serie", " action", "https://image.tmdb.org/t/p/w500/83mZf3gOBmx4b9cdbVBrW3jTE3U.jpg", "Vivez la Seconde Guerre Mondiale aux côtés de la Easy Company, un groupe de soldats américains. Suivez-les en tant que groupe, ou individuellement, depuis leur formation en 1942, jusqu'à la libération de l'Allemagne Nazie en 1945, en passant par leur parachutage en Normandie le 6 juin 1944.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Only Fools and Horses", "1981-09-08", "serie", " comedie", "https://image.tmdb.org/t/p/w500/3UIzEm9dyT3DloFQOfJHwvcF52u.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Ligue des Justiciers : Nouvelle génération", "2010-11-26", "serie", " action", "https://image.tmdb.org/t/p/w500/jBRUIjTAJdgX7cfO9wnMBtPywew.jpg", "Beaucoup de membres de la Ligue de Justice, les plus grands Super Héros de la Terre, vivent des aventures en solo, et sont souvent accompagnés d'un jeune protégé. Un jour, les jeunes Partenaires (Robin, Aqualad...) sont tous invités à visiter le quartier général de la Ligue, le Hall de Justice.  A peine ont-ils commencé ladite visite qu'une menace oblige leurs mentors à quitter les lieux, leur interdisant de quitter le Hall de Justice pour leur propre sécurité. Mais lorsque les jeunes héros découvrent une seconde menace, que leurs mentors n'ont pas remarqué en raison de la première qui les accapare, ils décident de prendre les choses en main...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'hôtel en folie", "1975-09-19", "serie", " comedie", "https://image.tmdb.org/t/p/w500/mI2KKCCgysG3JX39BM2C8zfqanV.jpg", "Créée par John Cleese, l'un des membres de la célèbre troupe des Monty Python, cette série met en scène Basil Fawlty, propriétaire irascible d'un hôtel à Torquay (Royaume-Uni), dominé par son épouse Sybil qui passe son temps au téléphone. Ils sont assistés de Polly, l'indispensable et très sensée femme de chambre, et de Manuel, l'homme à tout faire mexicain (espagnol dans la version originale), souffre-douleur de Basil.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Freaks and Geeks", "1999-09-25", "serie", " comedie", "https://image.tmdb.org/t/p/w500/tPqV63zcW6ZV0Hd48DMGb5UzQIG.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La 4ème Dimension", "1959-10-02", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/8wcKBq0jIREpUgPaa97e2V36SwK.jpg", "Nous sommes transportés dans une autre dimension, une dimension faite non seulement de paysages et de sons, mais surtout d'esprits. Un voyage dans une contrée sans fin dont les frontières sont notre imagination. Un voyage au bout des ténèbres où il n'y a qu'une destination : la Quatrième Dimension.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Monty Python's Flying Circus", "1969-10-05", "serie", " comedie", "https://image.tmdb.org/t/p/w500/nKiyYqYcRcQLgkLk0LFtRgtGMen.jpg", "Cette série mythique est une anthologie de sketches, de parodies d'émissions télévisées et de reportages improbables. Elle dénonce les travers de la société britannique et s'attaque avec un humour non-sens au monde politique, au sexe, à la religion, à l'armée, aux fonctionnaires...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Arrested Development", "2003-11-02", "serie", " comedie", "https://image.tmdb.org/t/p/w500/qMzwO952hMWQSCfHkp7IL20s4K7.jpg", "Veuf avec un fils de 13 ans, Michael est parti s'installer en Arizona pour débuter une nouvelle vie loin de sa riche famille. En apprenant l'arrestation de son père suite à des magouilles financières, Michael est contraint de rentrer auprès des siens.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Futurama", "1999-03-28", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/iN0LOeE2JnJpIy4jF7imUjO6jwn.jpg", "Accidentellement cryogénisé le 31 décembre 1999 alors qu'il livrait une pizza, Fry se réveille 1000 plus tard à New York. A l'aube de l'an 3000, le monde a bien changé, peuplé de robots et d'extrarrestres. Le jeune homme retrouve l'un de ses descendants qui l'engage lui et ses nouveaux amis, Leela et Bender, au Planet Express, une entreprise de livraison. Ensemble, ils vont devoir faire face à de périlleuses et délirantes missions dans un monde des plus surprenants.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "One-Punch Man", "2015-10-04", "serie", " action comedie", "https://image.tmdb.org/t/p/w500/a8BknzvFVK5EZ83rKg1a83iwaj0.jpg", "Le super-héros le plus puissant au monde est capable de tuer n'importe qui sans se fatiguer. Et c'est justement ça son problème : l'absence de défi et donc la morosité.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Rome", "2005-08-28", "serie", " action", "https://image.tmdb.org/t/p/w500/1A1BwgWO3Sw379VEhR0vkTuE3XW.jpg", "Les destins de deux soldats romains et de leurs familles alors que la République Romaine est en train de s'effondrer en laissant peu à peu la place à un Empire.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Game of Thrones", "2011-04-17", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/3iYNC7Iw6a65ed5GZz7KbInSHBd.jpg", "Il y a très longtemps, à une époque oubliée, une force a détruit l'équilibre des saisons. Dans un pays où l'été peut durer plusieurs années et l'hiver toute une vie, des forces sinistres et surnaturelles se pressent aux portes du Royaume des Sept Couronnes. La confrérie de la Garde de Nuit, protégeant le Royaume de toute créature pouvant provenir d'au-delà du Mur protecteur, n'a plus les ressources nécessaires pour assurer la sécurité de tous. Après un été de dix années, un hiver rigoureux s'abat sur le Royaume avec la promesse d'un avenir des plus sombres. Pendant ce temps, complots et rivalités se jouent sur le continent pour s'emparer du Trône de fer, le symbole du pouvoir absolu.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Battlestar Galactica : Mini Série", "2003-12-08", "serie", " action", "https://image.tmdb.org/t/p/w500/5Mgjv1Rd0GfYLJJYVgoFayreqan.jpg", "Les cylons reviennent après quarante ans d'absence pour exterminer la race humaine. Ils prennent les Douze Colonies au dépourvu en les bombardant toutes simultanément à l'aide d'armes nucléaires. La quasi-totalité des Douze Colonies est anéantie.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Black Books", "2000-09-29", "serie", " comedie", "https://image.tmdb.org/t/p/w500/tsUt2zYItvEtuFaRzOGJngCdO36.jpg", "Black Books est une librairie londonienne de seconde zone, tenue par un irlandais alcoolique répondant au doux nom de Bernard Black. Ce dernier ne fait aucun effort pour vendre ses livres ou s'habiller, il déteste ses clients et ne connaît rien à la comptabilité...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Battlestar Galactica", "2004-10-18", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/kPCJiwQHA4KenTybRbDPIRBlQls.jpg", "La trame narrative de Battlestar Galactica se trouve dans un système stellaire éloigné, où une civilisation humaine vit sur un groupe de planètes connues comme les Douze Colonies. Dans le passé, les colonies avaient été en guerre avec une race cybernétique de leur propre création, connu sous le nom des Cylons. Avec l'aide involontaire d'un humain du nom de Gaius Baltar, les cylons lancent une attaque surprise sur les colonies, dévastant les planètes et leurs populations. Sur une population initiale de plusieurs milliards, seulement 50 000 êtres humains en réchappent, dont la plupart se trouvaient à bord des navires civils qui ont évité la destruction des planètes. De tous la Flotte Coloniale, l'éponyme Battlestar Galactica semble être le seul navire amiral militaire qui a survécu à l'attaque. Sous la direction d'un commandant de la Flotte Coloniale William Bill Adama et de la présidente Laura Roslin, le Galactica et son équipage prennent la tâche de diriger la petite flotte fugitif de survivants dans l'espace à la recherche d'un refuge légendaire connu comme la Terre.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Deadwood", "2004-03-21", "serie", " policier", "https://image.tmdb.org/t/p/w500/M8HjXeXQy4Ta4MOrCmMHLr8pBl.jpg", "La ruée vers l'or, à l'Ouest des Etats-Unis, mène toute une population à migrer vers des terres plus arides. Parmi eux, beaucoup de criminels et de malfrats en tous genres, prêts à s'installer sur ces nouvelles contrées et y faire commerce... et ainsi profiter des arrivants. Deadwood est une de ces villes nouvelles autour desquelles se greffent les hommes avides d'or, les familles venues de loin, et les rapaces de toutes sortes. L'endroit idéal pour commencer une nouvelle vie, et, si possible, une nouvelle fortune... Proche des territoires indiens, et en des temps troubles, Deadwood est un poste avancé dans la colonisation des terres de l'ouest, et est témoin de son temps : la série commence deux semaines après la cuisante défaite du Général Custer contre Little Big Horn, alors que Deadwood se situe sur des territoires indiens - et est donc illégale par sa seule existence.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Star Trek", "1966-09-08", "serie", " horreur", "https://image.tmdb.org/t/p/w500/3ATqzWYDbWOV2RBLWNwA43InT60.jpg", "Cette série raconte les aventures vécues, au XXIIIe siècle, par James T. Kirk, capitaine du vaisseau Enterprise NCC-1701 et son équipage. Leur mission quinquennale est d'explorer la galaxie afin d'y découvrir d'autres formes de vie et d'enrichir ainsi les connaissances humaines.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dr House", "2004-11-16", "serie", " comedie", "https://image.tmdb.org/t/p/w500/pzAtg9rD4ybxqmzr4jqtnQs2qOF.jpg", "Dr House est un drame médical de la télévision américaine. Diffusé à l'origine pendant huit saisons sur le réseau Fox, du 16 Novembre 2004 jusqu'au 21 mai 2012. Le personnage principal est le Dr Gregory House, toxicomane, peu conventionnel, génie médical misanthrope qui dirige une équipe de diagnostiqueurs à l'hôpital universitaire de fiction de Princeton Plainsboro, dans le New Jersey.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Steins;Gate", "2011-04-06", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/5Ik5u3PGxtyC7TMpweiPyIMRm6e.jpg", "Un savant fou et ses amis inventent un téléphone à micro-ondes capable d'envoyer des textos dans le passé et qui permet de les faire voyager dans le temps.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Red Dwarf", "1988-02-15", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/gZqZ1iUEiy9BqpKZugzfNaGxWrX.jpg", "Red Dwarf est un vaisseau terrien minier de 8kms de long, qui circule en orbite autour de Saturne. A bord, officiers et miniers cohabitent tant bien que mal. Dave Lister vit à bord et possède un chat bien que cela soit strictement interdit. Découvert, il est enfermé dans un caisson cryogénique pour faute... A son réveil, le vaisseau est totalement vide. L'ordinateur de bord, prénommé Holly, lui explique que tout le monde est mort il y a trois millions d'années à cause d'une fuite radioactive. Pour lui tenir compagnie, Holly ressuscite Arnold Rimmer sous la forme d'un hologramme. Ce dernier, ex-compagnon de chambre de Dave n'est autre que son supérieur direct mais aussi son pire ennemi. Par la suite, Dave découvre Cat, un humanoïde qui est également le descendant direct de son chat. Sa race a évolué en fondant au passage une religion dont les dogmes sont issus de ce que Dave avait autrefois dit à son chat ! Dave, Cat, Arnold et Holly font alors route en direction de la Terre afin de savoir ce qu'elle est devenue pendant tout ce temps. ", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Oz", "1997-07-12", "serie", " policier", "https://image.tmdb.org/t/p/w500/CwqqwYWnMOLUwsqAqveHNnwTGC.jpg", "Oz. Oswald. Pénitencier de haute sécurité. Emerald city. Quartier expérimental de la prison créé par le visionnaire Tim McManus qui souhaite améliorer les conditions de vie des détenus. Mais dans cet univers clos et étouffant se recrée une société terrifiante où dominent la haine, la violence, la peur, la mort. Où tout espoir est vain, où la rédemption est impossible. Oz est l'endroit où je vis. Oz est l'endroit où je vais mourir, où la plupart d'entre nous vont mourir. Ce que nous sommes importe peu. Ce que nous allons devenir ne compte pas, explique le narrateur depuis sa cage en verre. Bienvenue dans l'antichambre de l'enfer.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Hunter x Hunter (2011)", "2011-10-02", "serie", " action comedie", "https://image.tmdb.org/t/p/w500/l5CLmiz0yPwusw3D10XaQDuSFTm.jpg", "Gon Freecss a presque douze ans, et rêve de devenir hunter (chasseur en anglais). Les hunters sont des aventuriers d'élite qui peuvent être chasseurs de prime, chefs-cuisinier, archéologues, zoologues, justiciers ou consultants dans divers domaines. Son père, Jin Freecss, qu'il ne connaît pas directement, est considéré comme le plus grand hunter de son temps. C'est aussi pour le retrouver que Gon veut devenir hunter. Cependant l'examen de hunter, qui a lieu chaque année, est extrêmement difficile et périlleux. On dit qu'un candidat sur 10 000 arrive sur le lieu des épreuves et qu'un seul candidat tous les trois ans devient hunter à sa première tentative. Durant les épreuves, il n'est pas rare d'être blessé, voire tué par des monstres, des pièges ou même d'autres concurrents…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Babylon 5", "1994-01-26", "serie", " horreur", "https://image.tmdb.org/t/p/w500/rj87TqwabgJzslrH4G6BCDseBKV.jpg", "En 2258, 10 ans après la guerre entre l'Alliance terrienne et la Fédération minbarie, Jeffrey Sinclair prend le commandement d'une station spatiale, appelée Babylon 5. Située dans un espace neutre, elle accueille les représentants des différentes races composant la communauté galactique au sein d'un Conseil regroupant cinq principales puissances et la Ligue des mondes non alignés qui sont décidés à maintenir la paix et la prospérité dans la galaxie. Mais, la mission de Sinclair, puis celle de John Sheridan, s'avère particulièrement difficile à cause des conflits entre mondes (les Centauris contre les Narns), des dissensions internes (chez les Minbaris, et aussi sur Terre). Petit à petit, des indices semblent prouver l'existence d'une race aux desseins destructeurs, les Ombres.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Justified", "2010-03-16", "serie", " policier", "https://image.tmdb.org/t/p/w500/4Tgga2tjWvosLWN4oKX9leAAAAQ.jpg", "Après des déboires avec ses supérieurs, le marshall Raylan Givens est muté au Kentucky, dont il est originaire. Là encore, ses méthodes assez peu orthodoxes et son style, très old school, vont faire des étincelles...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Samurai Champloo", "2004-05-20", "serie", " action comedie", "https://image.tmdb.org/t/p/w500/lYpHeSm7BcUxAbBx1ucuEH7oGAe.jpg", "La vie de la jeune Fû, serveuse dans un salon de thé, est bouleversée quand elle croise le chemin d’un vagabond un peu sauvage, Mugen, et d’un mystérieux rônin, Jin. Elle voit très vite en eux une échappatoire à sa vie morose et leur propose un marché alors qu’ils sont sur le point d’être exécutés par l’administrateur local : elle promet de leur sauver la vie s’ils acceptent de voyager à ses côtés pour retrouver le mystérieux « samouraï qui sent le tournesol ». ", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Venture Bros.", "2004-08-07", "serie", " action comedie", "https://image.tmdb.org/t/p/w500/r9IIGvYKRaIIBjvoaQrU7Hrvfb.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Code Geass: Hangyaku No Lelouch", "2006-10-05", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/teAmOAHTohbCtl01Eg8H8JuzbbQ.jpg", "Nous sommes en 2017. Sept ans se sont écoulés depuis que le Nouvel Empire de Britannia a déclaré la guerre au Japon. Ce dernier, n’ayant pu résister aux robots de combat de l’Empire (appelés Nightmares), est devenu un territoire de l’Empire connu sous le nom de Zone 11. Lelouch, jeune étudiant qui se joue des nobles, se retrouve un jour impliqué dans le vol d’une arme chimique, qui s’avère être en réalité une fille. Malheureusement pour lui, les soldats de l’Armée Impériale le retrouvent, le prennent pour un terroriste et s’apprêtent à le tuer. C’est alors que la fille s’interpose. Avant de mourir, elle parvient à accorder à Lelouch un pouvoir le mettant dans un état second, à partir duquel il a la possibilité de donner un ordre à quiconque. Un pouvoir qui force l’obéissance absolue. Que se passera-t-il ? D’où vient cette fille ? Qu’adviendra-t-il de Lelouch ?", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Shield", "2002-03-12", "serie", " action policier", "https://image.tmdb.org/t/p/w500/wnoxHqHOoP4VLBA8StwZ62xD4Sh.jpg", "Vic Mackey est un détective en charge d'un petit groupe : la Strike Team. Lui et les membres de cette équipe luttent avec acharnement contre les gangs, le trafic de drogue, etc. Pour cela, ils n'hésitent pas à utiliser leurs poings. David Acedeva, son supérieur, connaît les méthodes de Vic et essaye par tous les moyens de l'épingler.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La casa de papel", "2017-05-02", "serie", " policier", "https://image.tmdb.org/t/p/w500/2d0ESa56OesIFAOAl8ZZi0mHlxC.jpg", "Huit voleurs font une prise d'otages dans la Maison royale de la Monnaie d'Espagne, tandis qu'un génie du crime manipule la police pour mettre son plan à exécution.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Ligue des justiciers", "2001-11-17", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/1JszDEGLI6s5HjoGhe3VnfX2ez8.jpg", "Les plus grands super-héros du monde, menés par Superman, Batman, Green Lantern, Wonder Woman, Martian Manhunter, Flash, Aquaman, et Hawkgirl collaborent avec le soutien de leurs amis pour lutter plus efficacement contre la criminalité grandissante et les nouvelles menaces d'invasions extra-terrestres. Gardiens de la justice, ils sont le dernier rempart pour déjouer les conspirations les plus machiavéliques.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La caravane de l'étrange", "2003-09-14", "serie", " horreur", "https://image.tmdb.org/t/p/w500/5pKvfZ3qLuKJd8PQfKcPxN9jTO9.jpg", "La série se déroule aux Etats-Unis en 1934, durant la Grande Dépression de l'entre deux guerres. Nous y suivons deux personnages : Ben Hawkins, jeune fermier recueilli par le Carnivàle, un cirque ambulant où se côtoient femme à barbe, sœurs siamoises, homme-lézard et autres télépathes et dirigé par le mystérieux Patro. Ainsi que Justin Crowe, un révérend officiant dans la petite paroisse de Mintern et aidé par sa sœur Iris. On découvre vite que ces deux hommes sont liés par quelque mystérieux destin... qui sont-ils réellement et quelle est cette destinée ?", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The IT Crowd", "2006-02-03", "serie", " comedie", "https://image.tmdb.org/t/p/w500/2g0yrwH3wWfGfA6uXUPhtiQZYOx.jpg", "Roy et Moss travaillent au service informatique de la société Reynolds Industries, grande et obscure entreprise londonienne. Relégué dans le sous-sol du bâtiment, leur vie va être chamboulée par l'arrivé de leur nouvelle responsable, Jen, qui ne connait manifestement rien au travail de responsable ni en informatique.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Larry et son nombril", "2000-10-15", "serie", " comedie", "https://image.tmdb.org/t/p/w500/M6O2QeuIVMDer2U3bEpm8tBOG8.jpg", "Il a tout : une femme aimante, des amis fidèles, une belle carrière, une grande maison à Hollywood… et pourtant Larry ne peut s’empêcher de tout gâcher. Si la vie de Larry David tourne bien autour de son nombril, Larry, lui, est un grand névrosé.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Spaced", "1999-09-24", "serie", " comedie", "https://image.tmdb.org/t/p/w500/e9Slc8UFri8F1Eq1M6TQXn14RIK.jpg", "Tim Bisley (Pegg) et Daisy Steiner (Stevenson) sont deux jeunes paumés d'environ vingt ans qui se sont rencontrés par inadvertance dans un café. Tim est un dessinateur de comics qui ne se résout pas à montrer ses dessins de peur d’être ridiculisé. Largué par l’amour de sa vie, Sarah, il se retrouve à la rue, son maigre salaire de vendeur de comics comme seul revenu. Daisy est un jeune auteur, mais ne se décide pas à écrire, poussée constamment à la paresse et à des conversations stériles. Sa vocation ressemble plus à une couverture, idéal prétexte à l’oisiveté. Décidant à eux deux de s'en sortir, ils se font passer pour un couple « honnêtement » rémunéré auprès d'une loueuse, Marsha Klein (Julia Deakin). Ils se retrouvent logés dans une pension au 23 Meteor Street. Y vit aussi Brian Topp (Mark Heap), un artiste conceptuel et excentrique qui ne trouve son inspiration que dans la rage, le désespoir et l'agression. Le meilleur ami de Tim, Mike Watt (Nick Frost), et la meilleure amie de Daisy, Twist Morgan (Katy Carmichael), leur rendent visite fréquemment. La série les suit dans leur existence colorée et surréaliste alors qu'ils essayent de trouver un sens à cette vie mais surtout à tuer le temps de manière souvent peu productive.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Philadelphia", "2005-08-04", "serie", " comedie", "https://image.tmdb.org/t/p/w500/hnGbyiKLmK6gciYgD2HvXi9Pi29.jpg", "Quatre amis immatures qui tiennent un pub irlandais à Philadelphie  essaient de s'intégrer dans le monde adulte du travail et des relations sociales. Mais leurs biais et leurs préjugés leur font rencontrer de nombreux problèmes qui produisent tout autant de situations inconfortables.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "X-Files : Aux frontières du réel", "1993-09-10", "serie", " horreur", "https://image.tmdb.org/t/p/w500/4lpq3RwuecA6vLjxyYe6uVYNE2N.jpg", "Deux agents du FBI sont chargés d'enquêter sur les dossiers non résolus, appelés X-files la plupart du temps des affaires où le paranormal entre en jeu. L'agent Fox Mulder, malgré le scepticisme de sa co-équipière Dana Scully, tente de prouver sa thèse du complot gouvernement/extra-terrestres... Fox Mulder n'aura de cesse de rechercher sa soeur disparue des années auparavant lorsqu'il avait 12 ans. ", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sherlock Holmes 1984", "1984-04-24", "serie", " policier", "https://image.tmdb.org/t/p/w500/adrlVGuAGBNm36GPq1fuJ7uT8Qw.jpg", "Sherlock Holmes est un ensemble de quatre séries et cinq téléfilms britanniques produits par Michael Cox et June Wyndham-Davies pour Granada Television, et diffusés sur ITV sous les intitulés suivants : Les Aventures de Sherlock Holmes (The Adventures of Sherlock Holmes) : 13 épisodes (1984-1985) ; Le Retour de Sherlock Holmes (The Return of Sherlock Holmes) : 11 épisodes et 2 téléfilms (1986-1988) ; Les Archives de Sherlock Holmes (The Case-Book of Sherlock Holmes) : 6 épisodes et 3 téléfilms (1991-1993) ; Les Mémoires de Sherlock Holmes (The Memoirs of Sherlock Holmes) : 6 épisodes (1994).", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Generation Kill", "2008-07-13", "serie", " action", "https://image.tmdb.org/t/p/w500/wWLlB0DoPTt99Gx8Aw3hoL8X32u.jpg", "En plein coeur de la guerre... L'épopée de jeunes Marines engagés dans le conflit irakien. Appartenant au Premier Bataillon de Reconnaissance, ces jeunes soldats sont les premières troupes sur place et doivent faire avec le manque d'équipement, un commandement incompétent et une stratégie floue.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Chappelle's Show", "2003-01-22", "serie", " comedie", "https://image.tmdb.org/t/p/w500/o5FI6Xu30m2HDim07f6bHAos9ZC.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dragon Ball", "1986-02-26", "serie", " horreur action comedie", "https://image.tmdb.org/t/p/w500/jsAJ4o7IuwCUMhaAF3UGlzBL8vN.jpg", "Son Goku est un jeune garçon naïf et pur doté d'une queue de singe et d'une force extraordinaire. Il vit seul après le décès de son grand-père adoptif sur une montagne et en pleine nature ayant les caractéristiques d'une jungle. Un jour, il rencontre Bulma, une jeune fille de la ville très intelligente. Elle est à la recherche des sept boules de cristal légendaires appelées Dragon Balls. Dispersées sur Terre, ces Dragon Balls, une fois réunies, font apparaître Shenron, le Dragon sacré, qui exauce le souhait de celui qui l'a appelé. Amadoué, Son Goku accepte d'aider Bulma à retrouver les boules. Au cours de leur parcours initiatique, ils font de nombreuses rencontres. Son Goku, qui n'était jamais sorti de sa forêt, est amené à suivre un apprentissage auprès de maîtres comme Kamé Sennin ou Maître Karin et à participer à plusieurs championnats du monde d'arts martiaux.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Fringe", "2008-09-09", "serie", " horreur", "https://image.tmdb.org/t/p/w500/42At9ZbMmimCUsWIwFbJMSiI2QL.jpg", "Olivia Dunham, agent du FBI, le Dr Walter Bishop, un génie extravaguant et son fils Peter enquêtent sur des phénomènes étranges. Leurs découvertes les amèneront à mener une lutte sans merci pour la sauvegarde de notre univers face à la menace d'un univers parallèle.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Broadchurch", "2013-03-04", "serie", " policier", "https://image.tmdb.org/t/p/w500/f5gQRyTZ3v4asugU2F5HXE2FIDg.jpg", "L’assassinat d'un jeune garçon, Danny Latimer, met sous le feu des projecteurs la communauté de Broadchurch, petite ville côtière du comté de Dorset. L'inspecteur principal Alec Hardy, récemment nommé à son poste, est chargé de l'enquête avec le lieutenant Ellie Miller, proche de la famille Latimer.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Muppet Show", "1976-09-05", "serie", " comedie", "https://image.tmdb.org/t/p/w500/Aiv83wffJmKdmPgmnOD0vXmQjwe.jpg", "Que le spectacle commence ! Kermit la grenouille, Miss Peggy, Fozzie l'ours, et Gonzo, les marionnettes du Muppet Show, s'animent pour nous offrir un show haut en couleurs. En coulisses, alors que chacun prépare son numéro, la tension monte. Les Muppets se mettent en quatre pour recevoir leur invité d'honneur, la personnalité du moment ! Cerise sur gâteau, Statler et Waldorf, confortablement installés dans la loge-balcon, ne manque jamais une occasion de se moquer de leurs compères...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Killing", "2007-01-07", "serie", " policier", "https://image.tmdb.org/t/p/w500/9nAOU5zz01AWkzBg1ffpxLkmXwx.jpg", "Qui a violé et tué Nana Brik Larsen ? A Copenhague, la commissaire Sara Lund, mutée à Stockholm, a très peu de temps pour découvrir le meurtrier de cette jeune femme de 19 ans. Mais alors que l'enquête semble impliquer un politicien en vue, la brigade criminelle voit se multiplier les obstacles.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Office", "2001-07-09", "serie", " comedie", "https://image.tmdb.org/t/p/w500/tF9bX7sw3ujI8tMgUFCMtUN5hID.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Office (US)", "2005-03-24", "serie", " comedie", "https://image.tmdb.org/t/p/w500/qWnJzyZhyy74gjpSjIXWmuk0ifX.jpg", "Ce faux documentaire (mockumentary) raconte le quotidien d'un groupe d'employés de bureau dans une fabrique de papier en Pennsylvanie. Michael, le responsable régional, pense être le mec le plus drôle du bureau. Il ne se doute pas que ses employés le tolèrent uniquement parce que c'est lui qui signe les chèques. S'efforçant de paraître cool et apprécié de tous, Michael est en fait perçu comme étant pathétique...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Last Week Tonight with John Oliver", "2014-04-27", "serie", " comedie", "https://image.tmdb.org/t/p/w500/oyDSQz4tGMrDoBC5Q8wzFTdMo27.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Neon Genesis Evangelion", "1995-10-04", "serie", " horreur", "https://image.tmdb.org/t/p/w500/lqqlHAmCk5jPjAjWKvZkJzmYdt1.jpg", "En l'an 2000, une gigantesque explosion se produit en Antarctique, provoquant un cataclysme qui dévaste une grande partie de la planète. Les autorités déclarent que cette catastrophe est due à la chute d'un astéroïde. Quinze ans plus tard, l'humanité a surmonté cet événement, appelé le Second Impact. Mais de mystérieuses créatures nommées Anges font leur apparition, et tentent de détruire Tokyo-3, la nouvelle capitale-forteresse du Japon, construite après le Second Impact. Pour les combattre, l'organisation secrète NERV a mis au point une arme ultime, l'« Evangelion » ou « Eva », géant anthropoïde piloté comme une simple mécanique, mais en réalité créature bien mystérieuse. Shinji Ikari, quatorze ans, se rend à Tokyo-3 sur invitation de son père, qu'il n'a pas revu depuis 10 ans. Il est loin de se douter qu'il sera impliqué dans un conflit qui pourrait bien signifier la fin de l'humanité quoi qu'il arrive…", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "QI", "2003-09-11", "serie", " comedie", "https://image.tmdb.org/t/p/w500/hieAAv1MVYzRuX12ttVmlq7kGn9.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Buffy contre les vampires", "1997-03-10", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/plRYSuq4fkPojnkaWUXBbHAZi1i.jpg", "A chaque génération il y a une élue. Seule elle devra affronter les vampires, les démons et les forces de l'ombre. Concilier scolarité difficile et affrontements nocturnes, ce n'est pas facile. Et c'est pourtant le quotidien de Buffy, une adolescente comme les autres avec ses problèmes affectifs et scolaires, mais qui la nuit part à la chasse aux vampires !", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Stargate SG-1", "1997-07-27", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/rst5xc4f7v1KiDiQjzDiZqLtBpl.jpg", "Un anneau de trois mètres de diamètre fait d’un métal inconnu sur Terre constitue en fait une porte ouvrant un passage vers d’autres planètes. Des équipes de militaires et de scientifiques explorent ces différentes planètes, cherchant de nouvelles technologies pour combattre notamment les Goa’ulds, une espèce extraterrestre qui parasite des humains. Parmi ces équipes d’exploration, SG-1 devient la plus réputée, avec le colonel O’Neill, l’égyptologue Jackson, le major Carter et Teal’c, un humain d’une autre planète.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Années coup de cœur", "1988-01-31", "serie", " comedie", "https://image.tmdb.org/t/p/w500/tkaduqdhFrF1vp8L55OJfB5jw8Z.jpg", "Adulte, Kevin Arnold se remémore son enfance puis son adolescence dans une banlieue américaine à la fin des années 60. Si les multiples bouleversements que traverse le pays son présents en toile de fond (la guerre du Viêtnam, le mouvement hippie, le Watergate, les Beatles...), la série est avant tout la recréation de la vie quotidienne d'un jeune garçon franchissant les diverses étapes nécessaires (et communes à chacun d'entre nous) pour s'acheminer doucement vers l'âge adulte...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Better Call Saul", "2015-02-08", "serie", " comedie policier", "https://image.tmdb.org/t/p/w500/b6tpspJMOauCQqud0KOcwNSq3F3.jpg", "Spin-off de Breaking Bad six ans avant la rencontre avec Walter White. Jimmy McGill est un petit avocat, trop occupé à boucler ses fins de mois pour avoir de l'envergure. Pour survivre, il n'aura d'autre choix que de devenir Saul Goodman.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "BoJack Horseman", "2014-08-22", "serie", " comedie", "https://image.tmdb.org/t/p/w500/1bnrSsJNejoQq8lGBDECQroGjPz.jpg", "Retrouvez le cheval le plus adulé des années 1990, 20 ans plus tard. Il a beau avoir un caractère de cochon, au fond, c'est quand même un chouette type.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Banshee", "2013-01-11", "serie", " action policier", "https://image.tmdb.org/t/p/w500/fvocBFChMERoxWb7MMuTsUqWEis.jpg", "Banshee, une petite ville des Etats-Unis en territoire Amish, en Pennsylvannie, est quelque peu perturbée par un nouvel arrivant énigmatique, expert en arts martiaux, qui se fait passer pour le remplaçant du shérif récemment assassiné. Il a bien l'intention de faire régner la loi, mais à sa manière, concoctant des plans qui ne servent que son intérêt...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Narcos", "2015-08-28", "serie", " policier", "https://image.tmdb.org/t/p/w500/wQPhbZvfBKMZcfzLst2uGhaUY6S.jpg", "Cette série de gangsters inspirée de l'histoire du célèbre narcotrafiquant de Medellín raconte la guerre sanglante des cartels en Colombie.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Gomorra - La serie", "2014-05-06", "serie", " policier", "https://image.tmdb.org/t/p/w500/eXXpTmGxgNiifRS2eMarb1flhBG.jpg", "En Italie, la famille Savastano, dirigée par l'impitoyable Don Pietro, domine la mafia napolitaine. En concurrence avec un autre clan de la Camorra et confronté à une nouvelle génération décidée à prendre de l'importance sans respecter les codes, Don Pietro doit penser à préparer sa succession. Mais Genny, son fils, est loin d'avoir la maturité pour le succéder. Ciro, bras droit loyal de Don Pietro, homme de main efficace et mentor de Genny, devra user de malice, de courage et d'influence pour défendre les intérêts de son chef. Adaptation du roman de Roberto Saviano et du film Gomorra.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Fullmetal Alchemist", "2003-10-04", "serie", " action", "https://image.tmdb.org/t/p/w500/v9mndUyub3Ib5md42bk2C53jRV0.jpg", "L'histoire se déroule dans un monde où certaines personnes ont le pouvoir de transformer des objets en d'autres objets : on les appelle les alchimistes. Cette transformation doit obéir à une certaine règle : l'objet transformé et l'objet issu de la transformation doivent être d'une masse équivalente. Edward Elric est, malgré son jeune âge, un fameux alchimiste qui a perdu son petit frère, Alphonse, lors d'une expérience de transmutation interdite. Il a cependant réussi à sceller l'âme de celui‑ci dans une grande armure en fer. L'aventure des deux frères commence quand ils décident de partir à la recherche d'un objet aux mystérieux pouvoirs, capable de les aider à retrouver leurs corps initiaux : la très convoitée pierre philosophale. ", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Marvel's The Punisher", "2017-11-17", "serie", " action policier", "https://image.tmdb.org/t/p/w500/nzjF71dltZMTIjTWkGXtWzSZO7G.jpg", "Un ancien Marine déterminé à punir les criminels qui ont assassiné sa femme et ses enfants se retrouve plongé au cœur d'un complot militaire.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Ghost In The Shell: Stand Alone Complex", "2002-10-01", "serie", " horreur", "https://image.tmdb.org/t/p/w500/fXjGzKVahoK6DnSMhWFjs0XC0Tc.jpg", "Dans le futur, quand les améliorations technologiques du corps et la robotique est devenue une façon de vivre, le Major Motoko Kusanagi et la section 9 s'occupent de missions trop difficiles pour la police. La section 9 emploie des hackers, tireurs d'élite, détectives et cyborgs, dans le but de contrecarrer les cybercriminels et leurs plans visant les innocents.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Bugs Bunny Show", "1960-10-11", "serie", " comedie", "https://image.tmdb.org/t/p/w500/pgNdJZeO1ZyggAmMU1ThcydU3M2.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Columbo", "1971-09-15", "serie", " policier", "https://image.tmdb.org/t/p/w500/rCS5eW9diItoOkNPftvX4rVsuHk.jpg", "Un assassin génial qui croit avoir commis le crime parfait confronté à un inspecteur apparemment inoffensif, tel est le ressort dramatique de la série Columbo avec Peter Falk. Avec ses impers fripés et sa vieille Peugeot 403, l'inspecteur Columbo se démarque des policiers prêts à dégainer pour un oui ou pour un non. Ici, c'est l'intelligence qui prime. Un véritable jeu du chat et de la souris s'engage entre Columbo et le suspect. Contrairement aux autres séries où le but est de découvrir le coupable, le téléspectateur connaît depuis le début l'identité du meurtrier. La grande question est de savoir comment l'inspecteur va s'y prendre pour le confondre.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dexter", "2006-10-01", "serie", " policier", "https://image.tmdb.org/t/p/w500/bvvg43Y8ht4cm4El9LOEoqNDVxE.jpg", "Brillant expert scientifique du service médico-légal de la police de Miami, Dexter Morgan est spécialisé dans l'analyse de prélèvements sanguins. Mais Dexter cache un terrible secret  : c'est également un tueur en série ! Un serial killer pas comme les autres, avec sa propre vision de la justice, qui, grâce au code fourni par son père adoptif, ne s'en prend qu' à des victimes coupables de meurtres affreux ou de délits répréhensibles. Mais Dexter n'attend pas que la justice les libère ou les relâche faute de preuves, il les assassine avant même que la police ne remonte jusqu'à eux. Sa soeur Debra travaille dans le même commissariat et n'a de cesse que de traquer tous les meurtriers quelqu'ils soient... sans savoir qu'elle en fréquente un tous les jours !", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Batman: La série animée", "1992-09-05", "serie", " action", "https://image.tmdb.org/t/p/w500/iuMI6ipWrL21zIu6yCSR6astZPD.jpg", "Homme d'affaires le jour, Bruce Wayne devient Batman la nuit pour protéger Gotham City avec sa Batmobile. Avec l'aide de Robin et Batgirl il affronte de nombreux criminels légendaires.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Life on Mars", "2006-01-09", "serie", " horreur", "https://image.tmdb.org/t/p/w500/n2pJxiq74y19ghE7FXeYyDXh90y.jpg", "Le monde de l'inspecteur Sam Tyler va changer du tout au tout. Peu de temps après que sa petite amie ait été kidnappée par un serial killer, il est renversé par une voiture. Il se réveille en 1973... Devenu jeune inspecteur de police, il doit s'adapter à ce nouveau monde et découvre un lien entre un meurtre récent et le kidnapping de sa fiancée en 2006.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Bridge-Bron", "2011-09-21", "serie", " policier", "https://image.tmdb.org/t/p/w500/glYSKWScEO8SxbrKUlUsbz8lNMS.jpg", "A la frontière entre la Suède et le Danemark, au beau milieu d'un pont, est retrouvé le corps d'une femme, vraisemblablement assassinée. Les polices suédoises et danoises sont alors dépêchées sur les lieux. Mais l'affaire prend une tournure particulièrement glauque et étonnante lorsque les enquêteurs découvrent qu'il ne s'agit pas d'un seul mais de deux cadavres, coupés en deux à la taille, qui ont été assemblés pour n'en faire qu'un...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Father Ted", "1995-04-21", "serie", " comedie", "https://image.tmdb.org/t/p/w500/aM5bXf38BhcQLjX9gmVANOFmS0a.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dark", "2017-12-01", "serie", " horreur policier", "https://image.tmdb.org/t/p/w500/5LoHuHWA4H8jElFlZDvsmU2n63b.jpg", "Quatre familles affolées par la disparition d'un enfant cherchent des réponses et tombent sur un mystère impliquant trois générations qui finit de les déstabiliser.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "X-men", "1992-10-31", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/cDAy9vmtrpzzyiLmnlRKHPCzLGj.jpg", "Rejetés par la société, les mutants sont contraints de vivre dans la clandestinité. L'un d'entre eux, le professeur Charles Xavier, crée un institut pour mutants leur permettant ainsi de vivre une vie normale tout en développant leurs pouvoirs. L'idéal du Professeur Xavier se heurte à l'opposition farouche de la population et à des groupes extrémistes non dotés du facteur X, mais également à d'autres super mutants qui méprisent le dialogue et la condition humaine. Le combat pour la protection de l'humanité commence... Adaptation en série animée des célèbres comic's Books X-men de 1963 créé par Stan Lee et Jack Kirby", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Flight of the Conchords", "2007-06-17", "serie", " comedie", "https://image.tmdb.org/t/p/w500/ynboK8qiOTz0X44r59LpfF8jBP5.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "I Love Lucy", "1951-06-15", "serie", " comedie", "https://image.tmdb.org/t/p/w500/qvPk5BDS1tYRyoxerU6bYk5zix6.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Pushing Daisies", "2007-10-02", "serie", " horreur comedie policier", "https://image.tmdb.org/t/p/w500/oSRO8cGvve0pggPK9gHGItfl4j5.jpg", "Depuis l'enfance, Ned sait qu'il a un don un peu spécial. Il peut, très brièvement, ramener les gens à la vie. Adulte, il est devenu un fantastique pâtissier passant son temps libre à aider son seul ami, un détective privé, dans ses enquêtes. Ramener à la vie des victimes peut en effet être utile. Mais le jour où Ned ressuscite son amour d'enfance et que cette dernière reste vivante, tout se complique : s'il venait à la toucher une nouvelle fois, elle partirait définitivement...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Silicon Valley", "2014-04-06", "serie", " comedie", "https://image.tmdb.org/t/p/w500/dc5r71XI1gD4YwIUoEYCLiVvtss.jpg", "Dans la Silicon Valley d'aujourd'hui, les personnes les plus qualifiées pour réussir ne sont pas forcément celles les plus qualifiées pour savoir comment le gérer... Richard travaille chez Hooli et vit également avec plusieurs amis développeurs dans un « hacker hostel » (un « incubateur ») dirigé par le millionnaire Erlich. Ce dernier a obtenu cet argent en vendant son application Aviato et permet aux autres de vivre et travailler gratuitement dans sa maison en échange de 10% de ce qu’ils réalisent. Richard a créé un site web nommé Pied Piper permettant d’y envoyer une musique afin de savoir si d’autres morceaux avec les mêmes airs existent déjà afin d’éviter le plagiat. Le site est moqué par tout le monde et Erlich menace même de virer Richard de l’incubateur s’il ne devient pas plus rentable.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "This Is Us", "2016-09-20", "serie", " comedie", "https://image.tmdb.org/t/p/w500/7ZmbGXdpwC3bGKLhfa13R2enhAP.jpg", "Jack vit à Pittsburgh avec sa femme Rebecca, sur le point de donner naissance à des triplés. Arrivé à l'hôpital, le couple est pris en charge par le docteur Katowski. Kevin, jeune acteur lassé par la futilité du rôle qu'il tient dans une série, s'interroge sur sa carrière tandis que sa soeur jumelle, Kate, toujours au régime, est désespérée par ses kilos en trop. Abandonné à la naissance devant une caserne de pompiers, Randall, brillant juriste, a fait mener des recherches pour retrouver son père biologique mais hésite à le rencontrer. Ils ont en commun d'être nés le même jour et s'apprêtent à fêter leur 36e anniversaire...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "L'Enfer du Pacifique", "2010-03-14", "serie", " action", "https://image.tmdb.org/t/p/w500/xV7FKNqOwnO3aJSiRM8WCrwdRS8.jpg", "Suite à l'attaque de Pearl Harbor, le 7 décembre 1941, de jeunes américains pleins d'espoirs s'engagent dans l'armée pour défendre leur pays face à l'invasion japonaise. Ces soldats sont envoyés dans les îles du Pacifique où l'ennemi gagne du terrain. Ils n'ont aucune idée de l'enfer qui les attend. Les désillusions se mêlent vite à la peur, et la mort devient leur lot quotidien. Ce qu'ils vont vivre les changera à jamais. Suivez le parcours de trois marines américains - Robert Leckie, John Basilone et Eugene Sledge - au lendemain de l'attaque de Pearl Harbor jusqu'au retour à la maison des soldats après la capitulation japonaise...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Luther", "2010-05-04", "serie", " policier", "https://image.tmdb.org/t/p/w500/yKohEJaUKCQ0SQEneyVQBRiHEZz.jpg", "John Luther est policier à la section criminelle de Londres. Après avoir traité une affaire de tueur d'enfants, Luther a fait une dépression nerveuse qui a mis son mariage en péril. Très impliqué dans son travail, il doit lutter contre ses démons intérieurs qui sont parfois aussi dangereux que les criminels qu'il poursuit.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Boardwalk Empire", "2010-09-19", "serie", " policier", "https://image.tmdb.org/t/p/w500/yXZ0ooun7zNNBS9kuHS3TYlnYZ4.jpg", "La chronique sombre et violente du développement d'Atlantic City dans les années 20, lors de l'émergence des premiers casinos dans un climat de Prohibition, qui donnera naissance à la Pègre. Nucky Thompson, le trésorier du parti Républicain -qui dirige la ville- est en réalité celui qui tire toutes les ficelles et qui joue sur plus d'un tableau à la fois pour arriver à ses fins. Argent sale et corruption sont au rendez-vous, en passant par Chicago et New York...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Avatar : La légende de Korra", "2012-04-14", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/qsp8RtGvPHQ55ukKImVu0aWBCWk.jpg", "70 ans après les événements d’Avatar, le Dernier Maître de l'Air, voici les aventures du nouvel élu, une adolescente passionnée, courageuse et intrépide de la Tribu d’eau du Sud nommée Korra. Maîtrisant 3 des 4 éléments, c’est sous la tutelle du fils d’Aang, Tenzin, que Korra commence sa formation pour maîtriser le dernier élément : l’air. Mais le parcours de notre jeune prodige sera semé d’embûches, le danger gronde...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "An Idiot Abroad", "2010-09-23", "serie", " comedie", "https://image.tmdb.org/t/p/w500/nUQVZkN2Mna4aKSFU96OpPF9X2v.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mr. Robot", "2015-05-27", "serie", " policier", "https://image.tmdb.org/t/p/w500/kv1nRqgebSsREnd7vdC2pSGjpLo.jpg", "Elliot est un jeune programmeur anti-social qui souffre d'un trouble du comportement qui le pousse à croire qu'il ne peut rencontrer des gens qu'en les hackant. Il travaille pour une firme spécialisée dans la cyber-sécurité mais un homme connu sous le nom de Mr Robot l'approche un jour pour faire tomber une compagnie surpuissante qui fait partie de celles qu'il doit justement protéger...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Master of None", "2015-11-06", "serie", " comedie", "https://image.tmdb.org/t/p/w500/zl1MQ3bK9eRamwM4YwQVfEoxhj5.jpg", "Dev essaie de mettre sa carrière d'acteur sur les rails et de réussir côté cœur avec l'aide de sa bande éclectique d'amis.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Spider-Man", "1994-11-19", "serie", " action", "https://image.tmdb.org/t/p/w500/3fsISr52Gj8SXGZAXHQdQn4AGo6.jpg", "Peter Parker, un jeune étudiant, est un jour mordu par une araignée radioactive qui lui donne des super pouvoirs. En mémoire de son oncle Ben, mort dont il se sent responsable, il lutte contre le crime sous l'identité de Spider-man, l'homme araignée. Pour subvenir à ses besoins et ceux de sa Tante May, il gagne de l'argent en vendant les photos qu'il prend de ses exploits en Spider-man, au patron du Daily Bugle, Jonah Jameson. Ce dernier tente par tous les moyens de découvrir qui est Spider-Man, persuadé que celui-ci est un danger pour la société. Peter devra affronter de nombreux ennemis qui veulent le détruire tout en gardant son identité secrète pour préserver ses proches.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sneaky Pete", "2015-08-07", "serie", " policier", "https://image.tmdb.org/t/p/w500/5dU7taWEgoH1RnmBqyUKmcD4ig4.jpg", "Traqué par l'homme qu'il a trahi, un escroc change d'identité à sa sortie de prison. Ne sachant pas où aller, il prend l'identité de son compagnon de cellule et se rend dans la famille de celui-ci. Tout en donnant le change à ses nouveaux parents, le jeune homme doit trouver un moyen de sauver son jeune frère devenu la cible du gangster qui veut lui mettre la main dessus.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Stargate Atlantis", "2004-07-15", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/dcofw4ByyS0o2CZrYjzhgV2Pgd0.jpg", "Une nouvelle Porte des étoiles découverte dans la cité perdue d'Atlantis, au milieu des glaces de l'Antarctique, devient la nouvelle base secrète de l'armée. L'équipe Stargate : Atlantis a pour mission d'explorer la galaxie Pegase, où de nombreuses planètes ont été peuplées par la civilisation humaine qui vivait autrefois dans la cité d'Atlantis. Dans cet univers encore inconnu de la Terre, la nouvelle équipe d'explorateurs rencontrera un nouvel ennemi craint de tous : The Wraith...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Au-delà du Réel, l'Aventure continue", "1995-03-26", "serie", " horreur", "https://image.tmdb.org/t/p/w500/vk7XfOYMnmrAbXvV1JIXHf7FMZA.jpg", "Ceci n'est pas une défaillance de votre téléviseur... Difficile de décrire une anthologie brièvement : ce serait comme de vouloir faire un panorama de plus de 150 oeuvres de science-fiction et de fantastique, en quelques paragraphes. Ici, malgré des moyens techniques résolument modernes, fi des effets spéciaux: les intrigues portent sur des thèmes sociaux et/ou psychologiques plus que sur du grand spectacle. Au travers de ses sept saisons, Au-delà du réel, l'aventure continue s'est appliquée à traduire, au plus près de l'esprit de la série des années 60, l'âme humaine, ses peurs, ses failles, ses zones d'ombres, ses excès, ses folies... On y retrouve une quantité impresionnante d'acteurs, de réalisateurs, de scénaristes, ayant prouvé ou prouvant encore au petit écran, leur talent. ", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Shameless", "2011-01-09", "serie", " comedie", "https://image.tmdb.org/t/p/w500/7eDvhKCu7jkkKQI37nwYWvXJTzl.jpg", "Pour les enfants Gallagher, la vie est tout sauf un long fleuve tranquille... Fiona, l'aînée, âgée de 20 ans, élève du mieux possible sa soeur et ses quatre frères. Leur mère, Monica, les a abandonnés pour refaire sa vie avec une femme. Quant à leur père, Frank, paumé, chômeur et alcoolique, il dilapide l'argent des allocations familiales...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Altered Carbon", "2018-02-02", "serie", " horreur policier", "https://image.tmdb.org/t/p/w500/4MXuOmYWJAWRgKintIXDeXpzJbJ.jpg", "Sur la touche pendant 250 ans, il revient dans un nouveau corps pour enquêter sur un meurtre ahurissant. S'il résout l'affaire, il retrouvera la liberté.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Wentworth", "2013-05-01", "serie", " policier", "https://image.tmdb.org/t/p/w500/3iCxWUCrsaxtrn1LZToeYw4WtOP.jpg", "Condamnée, Bea Smith doit laisser sa fille derrière elle et découvre le monde de Wentworth, une prison de femmes australienne...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dragon Ball Z", "1989-04-26", "serie", " horreur action comedie", "https://image.tmdb.org/t/p/w500/jliNrwvGbWDOcdN1WFAZ17AG1tT.jpg", "Dragon Ball Z reprend l'histoire de Sangoku plusieurs années après son mariage avec Chichi. Le couple a un fils nommé Sangohan en hommage à son arrière grand-père du même nom. Un jour, Raditz atterrit sur la Terre et déclare qu'il est le frère de Sangoku. Il appartient au peuple des Sayajins, des guerriers intersidéraux mettant l'univers à feu et à sang. Leur planète, la planète Vegeta, a été détruite et il ne reste plus que quatre Sayajins purs : Sangoku, Raditz et ses complices partis en mission, Vegeta et Nappa. Sangoku refuse de s'associer à Raditz qui décide alors d'enlever Sangohan. C'est ici que commence cette grande aventure...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Ozark", "2017-07-21", "serie", " policier", "https://image.tmdb.org/t/p/w500/pCGyPVrI9Fzw6rE1Pvi4BIXF6ET.jpg", "Un conseiller financier embarque sa famille au fin fond du Missouri. Il doit y blanchir 500 millions de dollars en cinq ans pour calmer la fureur d'un baron de la drogue.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Hercule Poirot", "1989-01-08", "serie", " policier", "https://image.tmdb.org/t/p/w500/5shIDhTIfRnmUAXMS4wF2GF0NFO.jpg", "Hercule Poirot (Agatha Christie's Poirot ou seulement Poirot aux États-Unis) est une série télévisée britannique de 70 épisodes créée d'après l'œuvre d'Agatha Christie et diffusée entre le 8 janvier 1989 et le 13 novembre 2013 sur ITV. En France, la série est diffusée à partir du 16 avril 1991 sur FR3. La série est ensuite acquise par La Cinq en 1992, mais la chaîne n'aura le temps de diffuser qu'un seul épisode avant le dépôt de bilan : Énigme à Rhodes le 11 avril 19921. L'épisode L'Appartement du troisième devait être diffusé le 18 avril 19922. Elle est alors rediffusée sur FR3. Elle est actuellement régulièrement diffusée sur TMC et TV Breizh.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Parks and Recreation", "2009-04-09", "serie", " comedie", "https://image.tmdb.org/t/p/w500/9kWSJ9c8NlBY2WgfvOZZ71kafSx.jpg", "Le quotidien des employés du département des parcs et loisirs de Pawnee.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Star Trek : Deep Space Nine", "1993-01-03", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/amrjHOaXxkeVgSrVS0CVmqb3xhR.jpg", "Star Trek Deep Space Nine décrit les événements survenus au XXIVe siècle autour de la station spatiale Deep Space Nine (anciennement Terok Nor), commandée par le capitaine Benjamin Sisko. Initialement en orbite autour de la planète Bajor, une planète récemment occupée par les Cardassiens, cette station est déplacée à proximité d'un vortex artificiel, occupé par des entités intemporelles, découvert par Sisko, et permettant de voyager entre le Quadrant Alpha et le Quadrant Gamma encore inexploré. DS9 a pour mission d'administrer ce secteur de la galaxie devenu un important centre économique et politique.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Goliath", "2016-10-14", "serie", " policier", "https://image.tmdb.org/t/p/w500/AmiS3gGH5ybEnmnPRNzQdsLQHD5.jpg", "Autrefois puissant avocat, Billy McBride est maintenant épuisé et désenchanté, passant plus de temps dans les bars que dans les salles d'audience. Quand il accepte à contrecœur de reprendre un procès sur une mort suspecte contre le plus grand cabinet d'avocat Cooperman &amp; McBride,  qu'il a aidé à créer, Billy et son semblant d'équipe découvrent une vaste conspiration mortelle, les opposant tous dans un procès de vie ou de mort contre le Goliath ultime.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Police Squad !", "1982-03-04", "serie", " comedie", "https://image.tmdb.org/t/p/w500/Aqe4AEkVOHyt942WnyGYhiglUdT.jpg", "Frank Drebin est un fin limier de la police de Los Angeles... enfin presque ! S'il fait bien partie de la police de Los Angeles, le lieutenant Drebin est plutôt spécialisé dans les gaffes, quiproquos, interrogatoires surréalistes et catastrophes en chaîne. C'est à se demander comment il réussit à résoudre les enquêtes...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Extras", "2005-07-21", "serie", " comedie", "https://image.tmdb.org/t/p/w500/9X65NBvyLD6jCcp8elp6O00AQrX.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Star Trek : Voyager", "1995-01-16", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/msYAJySH9GlwFva4rI32i600I2Y.jpg", "La série met en scène les aventures du vaisseau USS Voyager commandé par une femme, la capitaine Kathryn Janeway. Cette dernière a été, au cours d'une mission, précipitée par une entité nommée le Pourvoyeur dans le Quadrant Delta, à l'autre bout de la galaxie, à environ 75 000 années-lumière de la Terre. La capitaine s'efforcera de trouver un moyen de ramener sur Terre son vaisseau mais le voyage de retour prend théoriquement 75 ans à vitesse maximale, elle trouvera donc des moyens de le raccourcir. L'épopée est très intéressante puisque l'équipage est confronté à toute sorte d'espèces hostiles ou non, la plupart post-distorsion.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Harry Bosch", "2014-02-06", "serie", " policier", "https://image.tmdb.org/t/p/w500/1phGmDufRU5jmUoPdNIuqiTLfEc.jpg", "Harry Bosch est un détective aux homicides à Los Angeles. Bien qu’il a été lavé de tout soupçon par les forces de l’ordre, il est toujours en procès, accusé d’avoir tué de sang-froid un potentiel tueur. Malgré cette affaire, qui s'avère médiatique, Harry refuse de s’éloigner de son travail et enquête sur des ossements qui viennent d’être retrouvés.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mr. Bean", "1990-01-01", "serie", " comedie", "https://image.tmdb.org/t/p/w500/zxSXC4968nPv9dew1eabg6yXKTs.jpg", "La série met en scène Mr. Bean, accompagné par son ours en peluche Teddy, il doit faire face à des situations inattendues (échange de pantalons ou crise cardiaque d'un passant par exemple). Il a également un certain don pour rendre compliquées certaines choses pourtant simples comme se préparer un sandwich, repeindre son appartement ou préparer ses bagages. Avec une absence presque totale de dialogue, ses aventures reposent sur ses prouesses comiques.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The End Of The Fucking World", "2017-10-24", "serie", " comedie policier", "https://image.tmdb.org/t/p/w500/xzwwzmXbz6n2Y3fc0GbjqGiFQPm.jpg", "Un ado psychopathe en herbe et une rebelle en quête d'aventure embarquent pour un road trip d'enfer dans cette série à l'humour noir inspirée d'un roman graphique.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Friends", "1994-09-22", "serie", " comedie", "https://image.tmdb.org/t/p/w500/7buCWBTpiPrCF5Lt023dSC60rgS.jpg", "Les péripéties de 6 jeunes newyorkais liés par une profonde amitié. Entre amour, travail, famille, ils partagent leurs bonheurs et leurs soucis au Central Perk, leur café favori...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Community", "2009-09-17", "serie", " comedie", "https://image.tmdb.org/t/p/w500/acCuY6pAhEGuFVL30ogNSZPyw2y.jpg", " Jeff est avocat. Mais Jeff doit surtout retourner à l'université car son certificat a été invalidé. Entre les femmes au foyer fraîchement divorcées et ceux qui reprennent les études pour garder leur esprit actif, Jeff intègre une bande de joyeux drilles qui découvre les joies de la vie sur le campus. Ils en apprennent plus sur eux-mêmes que sur les cours qu'ils suivent...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Coupling Six Sexy", "2000-05-12", "serie", " comedie", "https://image.tmdb.org/t/p/w500/k9772TXD7SztEovBsLtHh9EwH1S.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "FBI : Duo très spécial", "2009-10-23", "serie", " policier", "https://image.tmdb.org/t/p/w500/5ujOW5ZVVqioyLvqmWvlPx8gYLG.jpg", "L'association inattendue entre un agent du FBI et son pire ennemi, un malfaiteur-gentleman qu'il poursuit depuis des années ! Quand Neal Caffrey s'échappe d'une prison de haute sécurité pour retrouver son amour perdu, l'agent du FBI Peter Burke l'arrête à nouveau. Pour éviter de retourner en prison, Neal propose à son rival une solution alternative : sa liberté en échange de son aide pour traquer d'autres criminels...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Archer", "2009-09-16", "serie", " action comedie", "https://image.tmdb.org/t/p/w500/swCHJglRufH6rjmVYIXApRtCEPx.jpg", "La série se passe dans l'agence d'espionnage ISIS : l'International Secret Intelligence Service (SIS cf., ASIS, le SCRS, NZSIS) à New York, dont nous suivons l'équipe au quotidien. L'espion Sterling Archer, anti-héros élégant mais jouisseur et égoïste mène dans chaque épisode une mission d'ordre international. Malory Archer, sa dominatrice de mère, hypersexuelle et alcoolique, dirige et surveille les opérations en tant que patronne de l'agence. L'intrigue s'enrichit de l'ex-petite amie d'Archer, Lana Kane, également sa collègue et concurrente, ainsi que des autres employés d'ISIS (le comptable maladroit Cyril Figgis, la secrétaire nymphomane et masochiste aux multiples prénoms, et le docteur Krieger, savant fou, etc.). Les missions les confrontent régulièrement à des institutions internationales, des chefs politiques, des terroristes mais aussi des agences d'espionnage avec qui ISIS est en concurrence. En plus de l'action liée à la réalisation des missions d'espionnage, la série illustre les relations (conflits, machinations, manipulation, concurrence ; et rapports sexuels, la sexualité étant particulièrement présente) entre des personnages aux personnalités excentriques, doté chacun d'une certaine forme de folie.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Sons of Anarchy", "2008-09-03", "serie", " policier", "https://image.tmdb.org/t/p/w500/2qg0MOwPD1G0FcYpDPeu6AOjh8i.jpg", "L'histoire se déroule à Charming, ville fictive du comté de San Joaquin en Californie. Une lutte de territoires entre dealers et trafiquants d'armes vient perturber les affaires d'un club de bikers (Motorcycle Club, ou MC en anglais). Ce club, nommé , Sons of Anarchy Motorcycle Club Redwood Original couramment abrégé en SAMCRO, fait régner l'ordre dans Charming. Clay Morrow, président de SAMCRO et patron du garage Teller-Morrow, ainsi que Jax Teller, vice-président, mènent le club. Les Sons of Anarchy sont à la fois craints par la population mais également très respectés et admirés pour leur code d’honneur et leur capacité à maintenir l’ordre et rendre justice dans les situations délicates.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "La Vipère noire", "1983-06-15", "serie", " comedie", "https://image.tmdb.org/t/p/w500/y3rXOeklqhZ7BTBveW5WLJqyjgU.jpg", "Cette série humoristique suit les mésaventures de deux personnages, Edmund Blackadder et son domestique Baldrick, à travers les faits marquants de l'histoire de l'Angleterre, de 1485 à 1917. Les deux héros sont, à chaque saison, les descendants de leurs familles respectives. Il s'agit, en quelque sorte, d'une saga familiale s'étendant par pointillés sur plus de quatre siècles.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Trailer Park Boys", "2001-04-21", "serie", " comedie", "https://image.tmdb.org/t/p/w500/2oxnChmt8USYhMwWwx7pd04hpSI.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Batman - La relève", "1999-01-10", "serie", " action", "https://image.tmdb.org/t/p/w500/uC5a5SCy9siQejcSGpIehmm4Sya.jpg", "Trop vieux et incapable de poursuivre sa mission, Bruce Wayne raccroche le costume de Batman. Vingt ans plus tard, Gotham City est devenue une ville ultramoderne mais gangrénée par le crime. Le jeune Terry McGinnis, adolescent difficile, découvre la Batcave : Bruce Wayne, qui vit désormais reclus dans son manoir, est découvert ! Mais un événement tragique va unir les destinées de ces deux êtres torturés. Le père de Terry est assassiné par les hommes de main de l'homme d'affaire Derek Powers. Fou de rage, Terry enfile le costume de Batman et devient le nouveau justicier de Gotham...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Leftovers", "2014-06-29", "serie", " horreur", "https://image.tmdb.org/t/p/w500/xRSb3uOPxTjujx8azOGHl2H7Q3Z.jpg", "Du jour au lendemain, un 14 octobre en apparence ordinaire, 2% de la population disparaît mystérieusement de la surface de la terre. Ces gens, de tout âge, se sont évanouis dans la nature, sans explication, laissant leurs proches dans l'angoisse, voire le désespoir. Trois ans plus tard, la vie a repris son cours dans la bourgarde de Mapleton, une petit ville près de New York, mais rien n'est plus comme avant. Personne n'a oublié ce qui s'est passé, ni ceux qui ont disparu. A l'approche des cérémonies de commémoration, le chef de la police locale, Kevin Garvey, est en état d'alerte maximale : des affrontements dangereux se préparent entre la population et un groupuscule comparable à une secte...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Bob's Burgers", "2011-01-09", "serie", " comedie", "https://image.tmdb.org/t/p/w500/Ao5xQ9siHvT9lO7jBFnmtWCKllL.jpg", "Bob Belcher tient un petit restaurant de burgers dans une ville fictive américaine, aidé par sa femme, l'exubérante Linda, ainsi que ses trois enfants : Tina, l'aînée passionnée par les chevaux et les postérieurs, Gene, le garçon excentrique qui ne recule jamais devant un challenge, et enfin Louise, la petite dernière au caractère bien trempé toujours en train de faire des manigances.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Good Place", "2016-09-19", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/yqdQphFv4J5XGsRsKaVNr3g0V7l.jpg", "À sa mort, l'égocentrique Eleanor Shellstrop se retrouve par erreur dans un monde paradisiaque. Déterminée à y rester, elle va tenter de devenir une meilleure personne.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Atypical", "2017-08-11", "serie", " comedie", "https://image.tmdb.org/t/p/w500/Ai8NXxLzW4QrM4uWGT0LzLyKAlT.jpg", "Quand un ado autiste décide de trouver une petite amie, sa soudaine soif d’indépendance crée dans toute sa famille une remise en question aussi radicale qu'inattendue.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Boston Justice", "2004-10-03", "serie", " comedie", "https://image.tmdb.org/t/p/w500/gWQOLTUkAEKMarQbDah7zOYESp3.jpg", "Les affaires juridiques d'un grand cabinet de Boston et la vie privée de ses avocats.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Samuraï Jack", "2001-08-10", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/oSqIeS1nEiWGWNWuQXokzscI3X2.jpg", "Jack est un samouraï banni par Aku, une entité maléfique. Le samouraï n'ayant pu détruire Aku, son futur est tout entier sous la coupe du mal. Son objectif est dès lors de retourner dans le passé afin d'empêcher son funeste destin.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Rocko's Modern Life", "1993-09-18", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/mIflMMmR8dmKK3WqVQDmTXpHvwz.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Scrubs", "2001-10-02", "serie", " comedie", "https://image.tmdb.org/t/p/w500/x40NhjIPoDoTbT0z2utFgIedtwh.jpg", "J.D. est un jeune médecin qui débute sa carrière dans l'hôpital du Sacré-Coeur. Il vit avec son meilleur ami Turk, qui lui est chirurgien dans le même hôpital. Très vite, Turk tombe amoureux d'une infirmière Carla. Elliot entre dans la bande. C'est une étudiante en médecine quelque peu surprenante. Le service de médecine est dirigé par l'excentrique Docteur Cox alors que l'hôpital est géré par le diabolique Docteur Kelso. A cela viennent s'ajouter plein de personnages hors du commun : Todd le chirurgien obsédé, Ted l'avocat dépressif, le concierge qui trouve toujours un moyen d'embêter JD... Une belle galerie de personnage !", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Ash vs Evil Dead", "2015-10-31", "serie", " comedie", "https://image.tmdb.org/t/p/w500/wkHStHo0l34FzuSoaBvLx7nItWC.jpg", "Ash Williams, vendeur dans un magasin et, accessoirement, tueur de démons, vient de passer les 30 dernières années à fuir ses responsabilités quant aux diverses menaces des créatures des ténèbres. Mais quand la peste Deadites menace de détruire l'humanité, Ash est contraint de prendre son destin en main et de faire face à ses démons pour sauver le monde à sa manière...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les aventures de Tintin", "1991-10-02", "serie", " action", "https://image.tmdb.org/t/p/w500/36y4GIgQoT6sggr8Aq0Aek2bm2g.jpg", "Les Aventures de Tintin est une série télévisée d'animation franco-belgo-canadienne en dix-huit épisodes de 45 minutes et trois épisodes de 24 minutes, créée en 1991 d'après les albums des Aventures de Tintin de Hergé.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Minus et Cortex", "1995-09-09", "serie", " comedie", "https://image.tmdb.org/t/p/w500/eLew1HttT40izNwLfdhEyx6zFBd.jpg", "Cette série met en scène deux souris blanches de laboratoire désirant conquérir le monde. La première, Cortex est, comme son nom l'indique, le cerveau du duo. En revanche, Minus est doté d'une intelligence très limitée. C'est à partir de ce duo antagoniste (que l'on retrouve souvent dans les dessins animés) que se forme toute l'histoire.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mystery Science Theater 3000", "1988-11-24", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/jPfidt1FuZeaO6CxkmMAN7UyCge.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "FLCL", "2000-04-26", "serie", " comedie", "https://image.tmdb.org/t/p/w500/oXsPyKDalyKv5zgwJK7WQoVc3TA.jpg", "Mabase, petite ville tranquille du Japon. En rentrant chez lui, Naota, jeune écolier de 12 ans qui entretient des relations conflictuelles avec son père, se fait renverser par une furie en vespa, l'extravagante Haruko. Le lendemain, il apprend que son père a engagé Haruko en tant que gouvernante. Depuis ce jour, Naota voit d'étranges créatures mécaniques sortir de son crâne.  Fuliculi est une des séries les plus déjantées jamais produites par le studio Gainax (Gunbuster, Evangelion, Entre Elle et Lui) et Production IG (Ghost In The shell). Série de 6 OAV, elle est mise en images par Sadamoto Yoshiyuki (Evangelion) et scénarisée par Yoji Enomoto (Utena).", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Lost, les disparus", "2004-09-22", "serie", " action", "https://image.tmdb.org/t/p/w500/jyGspygDXJMydTOJj7iWNx9Elyd.jpg", "Après le crash de leur avion sur une île perdue, les survivants doivent apprendre à cohabiter et survivre dans cet environnement hostile. Bien vite, ils se rendent compte qu'une menace semble planer sur l'île...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Mozart in the Jungle", "2014-02-06", "serie", " comedie", "https://image.tmdb.org/t/p/w500/n2oyxjNak54jNiIPyHo6kZnuj9P.jpg", "Dans les coulisses de l'Orchestre philharmonique de New York, la dévotion artistique et la créativité se mélangent aux manipulations, à la politique et à l'instinct de survie. La série suit l'histoire d'une jeune joueuse de hautbois, Hailey, qui tente de trouver sa place dans un orchestre de renom mondial où l'égo n'a d'égal que l'excentricité, et celle d'un nouveau chef d'orchestre, Rodrigo.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "MASH", "1972-09-17", "serie", " comedie", "https://image.tmdb.org/t/p/w500/zO5HgIDD7b8CijM73WsOaCkaAV3.jpg", "La guerre n'est jamais facile à vivre, surtout quand on travaille dans un hôpital militaire mobile pendant la guerre de Corée. Pourtant, un groupe de chirurgiens et d'infirmières prend les choses avec humour, semant la pagaille dès qu'une occasion se présente.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Dead Like Me", "2003-06-27", "serie", " horreur comedie", "https://image.tmdb.org/t/p/w500/rdQMpds9Ovul49hHhbiNYJe3j19.jpg", "Georgia George Lass est une adolescente qui cherche sa place dans la vie et dans notre société. Mais la grande faucheuse la rattrape et elle décède, écrasée par un morceau de la cuvette des toilettes de la station spatiale Mir. Au lieu de rejoindre le paradis ou l'enfer, elle devient grim-reaper (ou undead, non-morte), job qui consiste à libérer les âmes des hommes avant leur mort ... Elle évolue donc au milieu des humains sous une apparence différente de celle qu'elle avait quand elle était en vie, doit travailler pour se loger et se nourrir - pas de régime de faveur pour les reapers - et s'acquitter de ses nouvelles responsabilités. Elle fait la rencontre de Rube qui semble être le chef des autres reapers qu'elle côtoie : Mason, Roxy et Betty. C'est lui, notamment, qui lui indique quelles sont les âmes qu'elle doit sauver, à l'aide de post-it, indiquant la ETD (Estimated Time of Death).", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "South Park", "1997-08-13", "serie", " comedie", "https://image.tmdb.org/t/p/w500/v9zc0cZpy5aPSfAy6Tgb6I1zWgV.jpg", "La petite ville de South Park dans le Colorado est le théâtre des aventures de Cartman, Stan, Kyle et Kenny, quatre enfants qui ont un langage un peu... décalé", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Doctor Who", "1963-11-23", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/2JQuvqyAIaznRSr5RjKofMAfpq5.jpg", "Les aventures du Docteur, un extraterrestre, un Seigneur du Temps originaire de la planète Gallifrey, qui voyage à bord d'un TARDIS (Time And Relative Dimension(s) In Space), une machine pouvant voyager dans l'espace et dans le temps. Le TARDIS a l'apparence d'une cabine de police (construction typiquement britannique ressemblant à une cabine téléphonique), le système de camouflage étant resté bloqué. Comme tous les Seigneur du Temps, le Docteur possède treize vies, ce qui explique sa capacité à changer de corps lorsqu'il est proche de la mort.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Handmaid’s Tale : la servante écarlate", "2017-04-26", "serie", " horreur", "https://image.tmdb.org/t/p/w500/tELIZw0ugIxqjBKrhWbROlgCbz4.jpg", "Dans une société dystopique et totalitaire au très bas taux de natalité, les femmes sont divisées en trois catégories : les Epouses, qui dominent la maison, les Marthas, qui l'entretiennent, et les Servantes, dont le rôle est la reproduction.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "22.11.63", "2016-02-15", "serie", " horreur", "https://image.tmdb.org/t/p/w500/mPH3YmzPHoLt0G8xfdXgX2wz4wW.jpg", "Un professeur voyage dans le temps pour essayer d'éviter le meurtre de JFK.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Marvel's Daredevil", "2015-04-10", "serie", " policier", "https://image.tmdb.org/t/p/w500/texZnNJ4tBUecabA9Hqs2kaqn9S.jpg", "Avocat luttant contre l'injustice et aveugle depuis l'enfance, Matt Murdock fait place au super-héros Daredevil lorsque la nuit tombe sur les rues de New York.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Happy Valley", "2014-04-29", "serie", " policier", "https://image.tmdb.org/t/p/w500/icOYQvsyM7m8cX515wOM0GPExYb.jpg", "Catherine Crowther est le sergent de garde, au commissariat de police du Yorkshire, lorsque le comptable Colin Weatherill fait irruption, l'air nerveux, pour rapporter un crime. D'abord avare en détails, il finit par craquer et explique qu'il a organisé un complot consistant à enlever la fille de son patron, dans le but de recevoir une rançon suffisante, lui permettant de mettre ses enfants dans une école privée. Mais, maintenant que le caïd du trafic de drogue local, David Cowgill, a mis le plan en action, Colin réalise l'horreur et la dangerosité de son projet. L'enlèvement de l'excentrique et colérique Ann Gallagher a lieu accompagné de ses retombées. Dès lors, Catherine s’évertue à rassembler les pièces du puzzle. Pour la jeune femme, retrouver Ann et traduire ces ravisseurs en justice est l'occasion de venger la mort de sa propre fille.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Whose Line Is It Anyway?", "1998-08-05", "serie", " comedie", "https://image.tmdb.org/t/p/w500/onGlQzY4VF4nRlp5bARIwh7eTDs.jpg", "", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Longmire", "2012-06-03", "serie", " policier", "https://image.tmdb.org/t/p/w500/dTxukwkJoBSvj1iJZLA1FJKFXqi.jpg", "Walt Longmire, le charismatique et dévoué shérif du comté d'Absaroka dans le Wyoming, est veuf depuis une année. Accablé par le chagrin, il a laissé son équipe se débrouiller sans lui durant plusieurs mois. Avec l’aide de sa nouvelle adjointe, Vic, il trouve la force d’aller de l’avant, reprenant goût à son travail et reconstruisant sa vie, pas à pas. Il est même prêt à se représenter pour un nouveau mandat face à Branch Connally , un jeune adjoint très ambitieux mais sans grande expérience. Heureusement, Longmire peut compter sur le soutien indéfectible de son vieil ami, un indien répondant au nom d’Henry.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Farscape", "1999-03-19", "serie", " horreur action", "https://image.tmdb.org/t/p/w500/bTgQNOeGrEDpB8iaBETvvFdJezS.jpg", "John Crichton est astronaute. Le jour où il part dans l'espace pour vérifier l'une de ses théories, son module est aspiré par un vortex et il se retrouve projeté dans une zone inconnue de l'univers où personne n'a jamais entendu parler ni de la terre ni des humains. Il est recueilli par un Léviathan avec à son bord trois prisonniers en train de s'échapper. Dès lors il n'aura de cesse de chercher un moyen pour pouvoir rentrer chez lui. Mais le voyage ne sera pas de tout repos car l'univers grouille de menaces plus dangereuses les unes que les autres... Mêlant habilement science-fiction, tragédie, comédie et irrévérence, Farscape manipule les codes du genre, et transforme les aventures de Crichton et de ses acolytes en une odyssée épique et bouleversante.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Les Contes de la crypte", "1989-06-10", "serie", " horreur comedie policier", "https://image.tmdb.org/t/p/w500/iqyWoDmRk6pj7pMz40EuNsYytKT.jpg", "Cette comédie horrifique est basée sur les comics des années 50 de Williams M. Gaines. Chaque épisode est une histoire indépendante, avec de prestigieuses guest-stars régulièrement devant ou derrière la caméra.", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "The Americans", "2013-01-30", "serie", " policier", "https://image.tmdb.org/t/p/w500/a5RlvETD1LTGVVEgGU4NdGm0sCN.jpg", "Phillip et Elizabeth Jennings, deux espions du KGB dont le mariage a été arrangé, s'installent avec leurs deux enfants dans la banlieue de Washington au début des années 80, juste après l'élection de Ronald Reagan à la Présidence. Se sentant une certaine affinité pour le mode de vie américain, le couple voit ses convictions mises à rude épreuve. Assumer une double identité va devenir de plus en plus difficile pour eux, d'autant qu'en cette période de Guerre Froide, le moindre faux pas peut leur coûter la vie...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+listeGlobal.push([listeGlobal.length, "Psych : Enquêteur malgré lui", "2006-07-07", "serie", " comedie", "https://image.tmdb.org/t/p/w500/uLNpc2BKJ5ZMAVr3HMMeCWy3xaa.jpg", "Fils de policier, Shawn Spencer a toujours appris à observer et noter les moindre détails. Lorsqu'il est accusé d'un crime à tort, il convainc la police qu'il a des pouvoirs psychiques et les aide à résoudre des affaires...", "TheDoudou", "JC & Hadrien", 0, "PJQVlVHsFF8"])
+//*/
+
+
+// Ajout manuel pour le shop
+listeGlobal.push([listeGlobal.length, 'Brazil', '1985', 'shop', 'Science-fiction', 'assets/img/affiche-film-brazil.jpg', 'Sam Lowry est un bureaucrate dans un monde rétro-futuriste totalitaire. Il se contente de son travail et de sa petite vie tranquille tout en s\'échappant en rêve dans un monde de héros romantiques. Son existence satisfaite, mais solitaire, est compliquée par l\'arrestation brutale d\'un certain Archibald Buttle, en raison d\'une erreur administrative. Il tente de réparer cette injustice et doit lutter contre un système extrêmement contrôlé qui le considère de plus en plus comme un dissident.', '	Terry Gilliam', 'Robert De Niro, Katherine Helmond', 8, '4Wh2b1eZFUM'])
+listeGlobal.push([listeGlobal.length, 'Piège de cristal', '1988', 'shop', 'action', 'http://fr.web.img2.acsta.net/pictures/14/08/14/12/00/419467.jpg', 'John McClane, policier new-yorkais, est venu rejoindre sa femme Holly, dont il est séparé depuis plusieurs mois, pour les fêtes de Noël dans le secret espoir d\'une réconciliation. Celle-ci est cadre dans une multinationale japonaise, la Nakatomi Corporation. Son patron, M. Takagi, donne une soirée en l\'honneur de ses employés, à laquelle assiste McClane. Tandis qu\'il s\'isole pour téléphoner, un commando investit l\'immeuble et coupe toutes les communications avec l\'extérieur...', 'John McTiernan', 'Bruce Willis', 12, 'XDg9AkYRWCc'])
+listeGlobal.push([listeGlobal.length, '58 minutes pour vivre', '1990', 'shop', 'action', 'https://lapelliculebrule.files.wordpress.com/2016/01/die-hard-2-58-minutes-pour-vivre-renny-harlin-bruce-willis-poster-affiche-e1454146352840.jpg', 'L\'inspecteur de police McClane attend que l\'avion de son épouse atterrisse dans un aéroport international proche de Washington. D\'étranges allers et venues attirent son attention. Il suit des hommes qui communiquent discrètement entre eux jusqu\'au sous-sol de l\'aéroport. Là, des inconnus tirent sur lui et des mercenaires prennent le contrôle de l\'aeroport, coupant toute communication avec l\'extérieur. Les passagers des avions prêts a l\'atterrissage, dont la femme de McClane, n\'ont plus que cinquante-huit minutes pour vivre !', 'Renny Harlin', 'Bruce Willis', 9, 'GSqM9QJgzYs'])
+listeGlobal.push([listeGlobal.length, 'Une journée en enfer', '1995', 'shop', 'action', 'http://fr.web.img6.acsta.net/c_280_373/medias/nmedia/18/36/04/16/18686568.jpg', 'Le lieutenant John McClane est de retour et il est demandé en personne par un terroriste, Simon, qui menace New York. Alors qu\'il fait équipe avec Zeus, un commerçant du quartier d\'Harlem embarqué dans l\'aventure malgré lui, McLane se livre à un petit jeu à travers toute la ville, devant résoudre des énigmes. S\'il rate son coup, une bombe explose, c\'est la règle imposée par Simon...', 'John McTiernan', 'Bruce Willis', 9, 'WUuFyQ4yy6w'])
+listeGlobal.push([listeGlobal.length, 'Retour en enfer', '2007', 'shop', 'action', 'http://s3.foxfilm.com/intlportal2/dev-temp/fr-FR/____547e649b0daaf.jpg', 'Pour sa quatrième aventure, l\'inspecteur John McClane se trouve confronté à un nouveau genre de terrorisme. Le réseau informatique national qui contrôle absolument toutes les communications, les transports et l\'énergie des Etats-Unis, est détruit de façon systématique, plongeant le pays dans le chaos. Le cerveau qui est derrière le complot a tout calculé à la perfection. Ou presque... Il n\'avait pas prévu McClane, un flic de la vieille école qui connait deux ou trois trucs efficaces pour déjouer les attaques terroristes.', 'Len Wiseman', 'Bruce Willis', 11, 'BW252_HAlS8'])
+listeGlobal.push([listeGlobal.length, 'Belle journée pour mourir', '2013', 'shop', 'action', 'http://fr.web.img2.acsta.net/medias/nmedia/18/94/29/36/20417688.jpg', 'Bruce Willis est de retour dans son rôle le plus mythique : John McClane, le « vrai héros » par excellence, qui a le talent et la trempe de celui qui résiste jusqu’au bout. Cette fois-ci, le flic qui ne fait pas dans la demi-mesure, est vraiment au mauvais endroit au mauvais moment après s\’être rendu à Moscou pour aider son fils Jack, qu\’il avait perdu de vue. Ce qu\’il ignore, c’est que Jack est en réalité un agent hautement qualifié de la CIA en mission pour empêcher un vol d’armes nucléaires. Avec la mafia russe à leur poursuite et la menace d\’une guerre imminente, les deux McClane vont découvrir que leurs méthodes radicalement différentes vont aussi faire d\’eux des héros que rien ne peut arrêter.', 'John Moore', 'Bruce Willis', 12, 'IBX_A-5iWYA'])
+listeGlobal.push([listeGlobal.length, 'Retour vers le futur', '1985', 'shop', 'Science-fiction', 'http://fr.web.img2.acsta.net/medias/nmedia/18/35/91/26/18686482.jpg', '1985. Le jeune Marty McFly mène une existence anonyme auprès de sa petite amie Jennifer, seulement troublée par sa famille en crise et un proviseur qui serait ravi de l\'expulser du lycée. Ami de l\'excentrique professeur Emmett Brown, il l\'accompagne un soir tester sa nouvelle expérience : le voyage dans le temps via une DeLorean modifiée. La démonstration tourne mal : des trafiquants d\'armes débarquent et assassinent le scientifique. Marty se réfugie dans la voiture et se retrouve transporté en 1955. Là, il empêche malgré lui la rencontre de ses parents, et doit tout faire pour les remettre ensemble, sous peine de ne pouvoir exister...', 'Robert Zemeckis', 'Michael J. Fox, Cristopher Lloyd', 12, '8gwpdm_AqDY'])
+listeGlobal.push([listeGlobal.length, 'Requiem for a Dream', '2000', 'shop', 'drame', 'https://images-na.ssl-images-amazon.com/images/I/51YXMFVDHQL._SY445_.jpg', 'Harry Goldfarb est un junkie. Il passe ses journées en compagnie de sa petite amie Marion et son copain Tyrone. Ensemble, ils s\'inventent un paradis artificiel. En quête d\'une vie meilleure, le trio est entraîné dans une spirale infernale qui les enfonce toujours un peu plus dans l\'angoisse et le désespoir. La mère d\'Harry, Sara, souffre d\'une autre forme d\'addiction, la télévision. Juive, fantasque et veuve depuis des années, elle vit seule à Coney Island et nourrit dans le secret l\'espoir de participer un jour à son émission préférée. Afin de satisfaire aux canons esthétiques de la télévision, elle s\'astreint à un régime draconien. Un jour, elle le sait, elle passera de l\'autre côté de l\'écran.', 'Réal', 'Acteur', 11, 'jzk-lmU4KZ4'])
+
+let mSize = 12
+let sSize = 12
+let mlist = []
+let slist = []
+let sslist = []
+let mCategory = ''
+let sCategory = ''
+let category = ''
+let choice = ''
+
+// Choix de la catégorie et bouton + - pour les films
+$('.featured_global_movie').click(function () {
+    let tmp = event.target.id.split(" ")
+    let choice = 'film'
+    let id = 0
+
+    if (tmp[1] == choice) {
+        mSize = 12
+        mCategory = tmp[0]
+        mlist = []
+
+        if (mCategory == 'all')
+            mCategory = '.*'
+        else
+            mCategory = mCategory
+    }
+
+    for (let i = 0; i < listeGlobal.length; i++) {
+        if (listeGlobal[i][3] == choice && (new RegExp(mCategory).test(listeGlobal[i][4]))) {
+
+            mlist[id] = listeGlobal[i]
+            id++
+        }
+    }
+
+    if (tmp[0] == 'more-movie' && mlist.length > 12) {
+        if (mSize >= 36)
+            mSize = 36
+        else
+            mSize += 12
+    }
+
+    if (tmp[0] == 'less-movie') {
+        if (mSize <= 12)
+            mSize = 12
+        else
+            mSize -= 12
+    }
+
+    if (mSize <= 12) {
+        $('#less-movie').css('display', 'none')
+        $('#more-movie').css('display', '')
+    } else if (mSize > 12 && mSize < 36) {
+        $('#less-movie').css('display', '')
+        $('#more-movie').css('display', '')
+    } else if (mSize == 36) {
+        $('#less-movie').css('display', '')
+        $('#more-movie').css('display', 'none')
+    }
+
+    listDomClear(choice)
+    drawCard(mlist.slice(0, mSize), choice)
+})
+
+// Et les séries, y'a moyen d'en faire qu'un mais faute de temps ...
+$('.featured_global_serie').click(function () {
+    let tmp = event.target.id.split(" ")
+    let choice = 'serie'
+    let id = 0
+
+    if (tmp[1] == choice) {
+        sSize = 12
+        sCategory = tmp[0]
+        slist = []
+
+        if (sCategory == 'all')
+            sCategory = '.*'
+        else
+            sCategory = sCategory
+    }
+
+    for (let i = 0; i < listeGlobal.length; i++) {
+        if (listeGlobal[i][3] == choice && (new RegExp(sCategory).test(listeGlobal[i][4]))) {
+            slist[id] = listeGlobal[i]
+            id++
+        }
+    }
+
+    if (tmp[0] == 'more-serie' && slist.length > 12) {
+        if (sSize >= 36)
+            sSize = 36
+        else
+            sSize += 12
+    }
+
+    if (tmp[0] == 'less-serie') {
+        if (sSize <= 12)
+            sSize = 12
+        else
+            sSize -= 12
+    }
+
+    if (sSize <= 12) {
+        $('#less-serie').css('display', 'none')
+        $('#more-serie').css('display', '')
+    } else if (sSize > 12 && sSize < 36) {
+        $('#less-serie').css('display', '')
+        $('#more-serie').css('display', '')
+    } else if (sSize == 36) {
+        $('#less-serie').css('display', '')
+        $('#more-serie').css('display', 'none')
+    }
+
+    listDomClear(choice)
+    drawCard(slist.slice(0, sSize), choice)
+})
+
+function drawChoice(type, choix) {
+    let tmpList = []
+    let choice = choix
+    let id = 0
+    for (let i = 0; i < listeGlobal.length; i++) {
+        if (listeGlobal[i][3] == choice && (new RegExp(type).test(listeGlobal[i][4]))) {
+            tmpList[id] = listeGlobal[i]
+            id++
+        }
+    }
+
+    listDomClear(choice)
+    drawCard(tmpList.slice(0, 12), choice)
+}
+
+// Modal quand on clic sur un film/série
+$('.open_modal_infos').click(function () {
+    let vId = event.target.id.replace('show-', '')
+
+    if (new RegExp(/show-[0-9]?/).test(event.target.id)) {
+        $('.modal-view-title').text(listeGlobal[vId][1])
+        $('.modal-view-img').attr('src', 'https://www.youtube.com/embed/'+listeGlobal[vId][10]) // 5 Picture 10 YT
+        $('.modal-view-img').attr('alt', listeGlobal[vId][1])
+        $('.modal-view-syno').text(listeGlobal[vId][6])
+        $('.modal-view-date').text('Date : ' + listeGlobal[vId][2])
+        $('.modal-view-genre').text('Genre : ' + listeGlobal[vId][4])
+        $('.modal-view-real').text('Réalisateur : ' + listeGlobal[vId][7])
+        $('.modal-view-actor').text('Acteurs : ' + listeGlobal[vId][8])
+        $('#showModalView').modal({
+
+        })
+    }
+})
+
+// Stop la video YT
+$('#showModalView').on('hidden.bs.modal', function() {
+    var $this = $(this).find('iframe')
+    tempSrc = $this.attr('src')
+    $this.attr('src', "")
+    $this.attr('src', tempSrc)
+})
+
+
+$(document).ready(function () {
+    // Transition d'effet pour la navbar et le bouton du footer
+    $(function () {
+        $(window).scroll(function () {
+            if ($(this).scrollTop() > 200) {
+                $('.navbar').addClass('solid')
+                $('#scrollUp').css('right', '5px')
+            } else {
+                $('.navbar').removeClass('solid')
+                $('#scrollUp').removeAttr('style')
+            }
+
+        })
+    })
+
+    // Génération d'une liste de base pour le top, All et shop
+    mid = 0
+    sid = 0
+    let ssid = 0
+
+    $('#less-movie').css('display', 'none')
+    $('#less-serie').css('display', 'none')
+
+    for (let i = 0; i < listeGlobal.length; i++) {
+        if (listeGlobal[i][3] == 'film') {
+            mlist[mid] = listeGlobal[i]
+            mid++
+        } else if (listeGlobal[i][3] == 'serie') {
+            slist[sid] = listeGlobal[i]
+            sid++
+        } else if (listeGlobal[i][3] == 'shop') {
+            sslist[ssid] = listeGlobal[i]
+            ssid++
+        }
+    }
+
+    // Affichage du 1er film dans le shop
+    $('.shop-title').text(sslist[0][1].toUpperCase())
+    $('.shop-syno').text(sslist[0][6])
+    $('.shop-date').text(sslist[0][2])
+    $('.shop-genre').text(sslist[0][4])
+    $('.shop-price').text(sslist[0][9]+' Euro')
+    $('.shop-trailer').attr('src', 'https://www.youtube.com/embed/'+sslist[0][10])
+
+    // Affichage des catégories (top film etc)
+    drawCard(mlist.slice(0, 5), 'top')
+    drawCard(mlist.slice(0, mSize), 'film')
+    drawCard(slist.slice(0, sSize), 'serie')
+    drawCard(sslist.slice(0, 8), 'shop')
+    
+})
+
+
+// Gestion du défilement du shop
+let shopId = 0
+
+$('#btnLeft').click(function () {
+    shopId--
+    if (shopId < 0)
+        shopId = 7
+    
+    $('.shop-title').text(sslist[shopId][1].toUpperCase())
+    $('.shop-syno').text(sslist[shopId][6])
+    $('.shop-date').text(sslist[shopId][2])
+    $('.shop-genre').text(sslist[shopId][4])
+    $('.shop-price').text(sslist[shopId][9]+' Euro')
+    $('.shop-trailer').attr('src', 'https://www.youtube.com/embed/'+sslist[shopId][10])
+})
+
+$('#btnRight').click(function () {
+    shopId++
+    if (shopId > 7)
+        shopId = 0
+    
+    $('.shop-title').text(sslist[shopId][1].toUpperCase())
+    $('.shop-syno').text(sslist[shopId][6])
+    $('.shop-date').text(sslist[shopId][2])
+    $('.shop-genre').text(sslist[shopId][4])
+    $('.shop-price').text(sslist[shopId][9]+' Euro')
+    $('.shop-trailer').attr('src', 'https://www.youtube.com/embed/'+sslist[shopId][10])
+})
+
+// Formulaire de contact
+function myclick() {
+    var firstname = document.getElementById("firstname").value
+    var lastname = document.getElementById("lastname").value
+    var email = document.getElementById("email").value
+    var subject = document.getElementById("subject").value
+    var message = document.getElementById("message").value
+    alert(firstname + ' ' + lastname + '\n' + email + '\n' + subject + '\n' + message)
+    return false //do not submit the form
+}
