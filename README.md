@@ -27,4 +27,4 @@ Les dificultés et détails par TheDoudou :
 
 Les dificultés et détails par Hadrien :
 
-Les dificultés et détails par Jean-Char :
+Les dificultés et détails par Jean-Charles :
