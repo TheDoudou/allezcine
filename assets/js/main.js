@@ -111,9 +111,9 @@ function rgpd() {
 * Traitement du bouton majeur
 */
 $(window).on('load', function () {
-    /*$('#exampleModalCenter').modal({
+    $('#exampleModalCenter').modal({
         backdrop: 'static'
-    })*/
+    })
 })
 
 $('.btn-login').click(function () {
