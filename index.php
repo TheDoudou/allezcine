@@ -14,7 +14,7 @@ if ($md5_scss != $md5_data) {
 	$file_data = fopen("assets/data/main_md5", "w");
 	fwrite($file_css, $css);
     fwrite($file_data, $md5_scss);
-    echo 'Compile ok';
+    //echo 'Compile ok';
 }
 ?>
 
@@ -283,10 +283,10 @@ if ($md5_scss != $md5_data) {
     <div class="content social-link-content">
         <div class="row">
             <ul class="social-btns">
-                <li><button class="btn btn-twitter btn-round font-weight-bold">Twitter<i class="fa fa-twitter fa-black pull-right" aria-hidden="true"></i></button></li>
-                <li><button class="btn btn-facebook btn-round font-weight-bold">Facebook<i class="fa fa-facebook fa-black pull-right" aria-hidden="true"></i></button></li>
-                <li><button class="btn btn-google btn-round font-weight-bold">Dribbble<i class="fab fa-dribbble fa-black pull-right" aria-hidden="true"></i></button></li>
-                <li><button class="btn btn-google btn-round font-weight-bold">Google<i class="fa fa-google-plus fa-black pull-right" aria-hidden="true"></i></button></li>
+                <li><button class="btn btn-twitter btn-round font-weight-bold">Twitter<i class="fa fa-twitter fa-white pull-right" aria-hidden="true"></i></button></li>
+                <li><button class="btn btn-facebook btn-round font-weight-bold">Facebook<i class="fa fa-facebook fa-white pull-right" aria-hidden="true"></i></button></li>
+                <li><button class="btn btn-google btn-round font-weight-bold">Dribbble<i class="fab fa-dribbble fa-white pull-right" aria-hidden="true"></i></button></li>
+                <li><button class="btn btn-google btn-round font-weight-bold">Google<i class="fa fa-google-plus fa-white pull-right" aria-hidden="true"></i></button></li>
             </ul>
         </div>
     </div>
