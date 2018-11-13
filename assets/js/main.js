@@ -325,11 +325,11 @@ let drawCard = (data, section) => { // Créer les cartes des films etc
 
         let col = document.createElement('div')
         if (section == 'top' && i == 0)
-            col.className = 'card_featured col-2 offset-md-1'
+            col.className = 'card_featured col-sm-6 col-md-2 offset-md-1'
         else if (section == 'shop')
-            col.className = 'card_featured col-3'
+            col.className = 'card_featured col-sm-6 col-md-3'
         else
-            col.className = 'card_featured col-2'
+            col.className = 'card_featured col-sm-6 col-md-2'
 
         col.setAttribute('id', 'show-' + list[id][0])
 
