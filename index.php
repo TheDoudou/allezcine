@@ -54,7 +54,7 @@ if ($md5_scss != $md5_data) {
     <!-- Fin boite de dialog majeur -->
     <header>
         <!-- Début NavBar -->
-        <nav class="navbar fixed-top navbar-dark bg-dark navbar-expand-md" role="navigation">
+        <nav class="navbar fixed-top navbar-dark bg-dark navbar-expand-xl" role="navigation">
             <!-- Brand and toggle get grouped for better mobile display -->
             <a class="navbar-brand font-weight-bold" href="#"><span class="text-red">ALLEZ</span><span class="text-white">CINE!</span></a>
             <button type="button" class="navbar-toggler collapsed custom-toggler" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
