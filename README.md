@@ -28,3 +28,7 @@ Les difficultés et détails par TheDoudou :
 Les difficultés et détails par Hadrien :
 
 Les difficultés et détails par Jean-Charles :
+- Au niveau du featured Movies j'ai eu des difficulté d'allier le css et le bootstrap pour qu'il y ait moins d'espaces entre les photos 
+- Rencontré aussi des problèmes au niveau du Javascript 
+- Au niveau du shop moovies :
+    - difficultés pour le redimenssionnement des div images (avec bootstrap) .
