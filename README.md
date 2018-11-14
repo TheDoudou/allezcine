@@ -26,6 +26,10 @@ Les difficultés et détails par TheDoudou :
 - La NewsLetter, rien de spécial (visible au clic sur SUBSCRIBE)
 
 Les difficultés et détails par Hadrien :
+- Pour ma part, le fait de reprendre du bootstrap m'a fait du bien, j'ai pu m'exercer à nouveau sur la réalisation du footer et me faire une piqure de rappel de tout ce qui était colonne et container.
+- Le bouton qui permet de remonter à la navbar était un bon challenge pour moi car j'ai toujours des difficultés en javascrpit.
+- J'ai pu m'entrainer à réaliser aussi le Formulaire " contact us" , il n'est peut etre pas parfait mais il est fonctionnel.
+- Je suis plutôt satisfait de mon travail même si ma vitesse de résolution des problèmes me prend toujours un temps assez conséquent.
 
 Les difficultés et détails par Jean-Charles :
 - Au niveau du featured Movies j'ai eu des difficulté d'allier le css et le bootstrap pour qu'il y ait moins d'espaces entre les photos 
