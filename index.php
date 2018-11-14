@@ -134,8 +134,8 @@ if ($md5_scss != $md5_data) {
             </div>
         </div>
         <!-- Fin jumbotron -->
-        <div class="bg-red text-white nav-login">
-            <div class="row">
+        <div class="text-white nav-login">
+            <div class="row bg-red">
                 <div class="nav-tel">
                     <i class="fa fa-phone"></i>&nbsp;(+000) 009 455 4088
                 </div>
