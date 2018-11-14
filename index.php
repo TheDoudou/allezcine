@@ -42,7 +42,7 @@ if ($md5_scss != $md5_data) {
                     <h5 class="modal-title" id="exampleModalLongTitle">Etes vous majeur ?</h5>
                 </div>
                 <div class="modal-body">
-                    <p>Vous devez avoir au moins 18 ans pour consulté ce site</p>
+                    <p>Vous devez avoir au moins 18 ans pour consulter ce site</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-age-cancel">Je n'ai pas 18 ans</button>
